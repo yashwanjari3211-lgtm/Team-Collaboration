@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getMessages } from '../api/messages'
 import { getTasks } from '../api/tasks'
 import { getChannels } from '../api/channels'
+import { getOrganizations } from '../api/organizations'
 import { setMessages, setMessagesLoading } from '../store/messageSlice'
 import { setTasks, setTasksLoading } from '../store/taskSlice'
 import { setChannels, setChannelsLoading } from '../store/channelSlice'
@@ -40,20 +41,26 @@ export default function DashboardPage() {
     fetchUser()
   }, [dispatch])
 
-  // Fetch channels on mount
+  // Fetch organizations and channels on mount
   useEffect(() => {
-    const fetchChannels = async () => {
+    const fetchOrgAndChannels = async () => {
       dispatch(setChannelsLoading(true))
       try {
-        const res = await getChannels(1) // workspace_id = 1
-        dispatch(setChannels(res.data))
+        const orgRes = await getOrganizations()
+        if (orgRes.data.length > 0) {
+          const org = orgRes.data[0]
+          localStorage.setItem('activeOrganizationId', org.id)
+          
+          const chRes = await getChannels()
+          dispatch(setChannels(chRes.data))
+        }
       } catch (err) {
-        console.error('Failed to fetch channels:', err)
+        console.error('Failed to fetch orgs and channels:', err)
       } finally {
         dispatch(setChannelsLoading(false))
       }
     }
-    fetchChannels()
+    fetchOrgAndChannels()
   }, [dispatch])
 
   // Fetch messages and tasks when active channel changes

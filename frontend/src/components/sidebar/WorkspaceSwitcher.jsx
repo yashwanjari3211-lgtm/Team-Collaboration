@@ -1,6 +1,10 @@
+import { useState } from 'react'
 import TeamCollabLogo from '../common/TeamCollabLogo'
+import { UserPlus } from 'lucide-react'
+import InviteModal from './InviteModal'
 
 export default function WorkspaceSwitcher({ collapsed }) {
+  const [isInviteOpen, setIsInviteOpen] = useState(false)
   return (
     <div
       className={`flex items-center gap-3 border-b border-surface-100 dark:border-surface-800 cursor-pointer transition-colors duration-150 ${
@@ -11,13 +15,23 @@ export default function WorkspaceSwitcher({ collapsed }) {
         <TeamCollabLogo size={18} />
       </div>
       {!collapsed && (
-        <div className="min-w-0">
-          <h1 className="text-sm font-bold text-surface-900 dark:text-white truncate">Team Collab</h1>
-          <p className="text-[11px] text-surface-400 truncate flex items-center gap-1 font-medium mt-0.5">
-            Default Workspace <span className="text-[9px] text-surface-400">▼</span>
-          </p>
+        <div className="flex-1 min-w-0 flex items-center justify-between">
+          <div className="min-w-0">
+            <h1 className="text-sm font-bold text-surface-900 dark:text-white truncate">Team Collab</h1>
+            <p className="text-[11px] text-surface-400 truncate flex items-center gap-1 font-medium mt-0.5">
+              Default Organization <span className="text-[9px] text-surface-400">▼</span>
+            </p>
+          </div>
+          <button 
+            onClick={(e) => { e.stopPropagation(); setIsInviteOpen(true); }}
+            className="p-1.5 rounded-lg hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-500 dark:text-surface-400 transition-colors"
+            title="Invite members"
+          >
+            <UserPlus className="w-4 h-4" />
+          </button>
         </div>
       )}
+      <InviteModal isOpen={isInviteOpen} onClose={() => setIsInviteOpen(false)} />
     </div>
   )
 }

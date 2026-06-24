@@ -7,5 +7,5 @@ class Channel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    workspace_id = Column(Integer, ForeignKey('workspaces.id'))
+    organization_id = Column(Integer, ForeignKey('organizations.id'))
     created_at = Column(DateTime(timezone=True), server_default=func.now())

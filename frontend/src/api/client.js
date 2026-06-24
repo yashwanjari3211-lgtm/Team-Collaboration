@@ -4,11 +4,15 @@ const client = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api'
 })
 
-// Request interceptor: attach JWT token
+// Request interceptor: attach JWT token and Organization ID
 client.interceptors.request.use(config => {
   const token = localStorage.getItem('token')
+  const orgId = localStorage.getItem('activeOrganizationId')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
+  }
+  if (orgId) {
+    config.headers['X-Organization-Id'] = orgId
   }
   return config
 })

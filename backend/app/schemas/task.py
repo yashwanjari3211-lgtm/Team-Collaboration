@@ -22,6 +22,7 @@ class TaskOut(BaseModel):
     status: str
     assignee_id: int | None
     channel_id: int
+    organization_id: int
     due_date: datetime | None
     created_at: datetime
 

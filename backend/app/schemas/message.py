@@ -10,6 +10,7 @@ class MessageOut(BaseModel):
     content: str
     channel_id: int
     user_id: int
+    organization_id: int
     created_at: datetime
 
     class Config:
