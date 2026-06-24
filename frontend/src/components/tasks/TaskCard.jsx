@@ -1,9 +1,11 @@
 import Avatar from '../common/Avatar'
-import { Calendar, Flag } from 'lucide-react'
 
 function isOverdue(dateStr) {
   if (!dateStr) return false
-  return new Date(dateStr) < new Date()
+  const due = new Date(dateStr)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return due < today
 }
 
 function formatDueDate(dateStr) {
@@ -12,13 +14,15 @@ function formatDueDate(dateStr) {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
-const PRIORITY_COLORS = {
-  high: 'text-rose-500',
-  medium: 'text-amber-500',
-  low: 'text-surface-400',
+const PRIORITY_BORDER_COLORS = {
+  high: 'border-l-[#EF4444]',
+  medium: 'border-l-[#F59E0B]',
+  low: 'border-l-[#10B981]',
 }
 
 export default function TaskCard({ task }) {
+  const priority = task.priority || ['medium', 'high', 'low'][task.id % 3]
+  const tag = task.tag || ['UI', 'BUG', 'FEAT', 'API'][task.id % 4]
   const overdue = isOverdue(task.due_date) && task.status !== 'done'
   const dueFormatted = formatDueDate(task.due_date)
 
@@ -31,43 +35,58 @@ export default function TaskCard({ task }) {
     <div
       draggable
       onDragStart={handleDragStart}
-      className="bg-white dark:bg-surface-850 border border-surface-200 dark:border-surface-700 rounded-lg p-3 cursor-grab active:cursor-grabbing hover:shadow-md dark:hover:shadow-surface-900/50 transition-all duration-200 group"
+      className={`bg-white dark:bg-surface-850 border border-surface-200 dark:border-surface-700 border-l-[3px] ${
+        PRIORITY_BORDER_COLORS[priority]
+      } rounded-lg p-3 cursor-grab active:cursor-grabbing hover:-translate-y-[2px] hover:border-brand-500 hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-150 ease-in-out group`}
     >
       {/* Title */}
-      <p className={`text-[13px] font-medium leading-snug ${
-        task.status === 'done'
-          ? 'line-through text-surface-400'
-          : 'text-surface-800 dark:text-surface-200'
-      }`}>
+      <p
+        className={`text-[13px] font-medium leading-snug pl-[10px] ${
+          task.status === 'done'
+            ? 'line-through text-surface-400'
+            : 'text-surface-800 dark:text-surface-200'
+        }`}
+      >
         {task.title}
       </p>
 
       {/* Description preview */}
       {task.description && (
-        <p className="text-[12px] text-surface-400 mt-1 line-clamp-2 leading-relaxed">
+        <p className="text-[12px] text-surface-400 mt-1 pl-[10px] line-clamp-2 leading-relaxed">
           {task.description}
         </p>
       )}
 
-      {/* Footer: assignee, due date, priority */}
-      <div className="flex items-center justify-between mt-2.5">
-        <div className="flex items-center gap-2">
-          {task.assignee_id && (
-            <Avatar name={`User ${task.assignee_id}`} size="xs" />
-          )}
-          {dueFormatted && (
-            <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded ${
-              overdue
-                ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400'
-                : 'bg-surface-100 dark:bg-surface-800 text-surface-500'
-            }`}>
-              <Calendar className="w-3 h-3" />
-              {dueFormatted}
+      {/* Footer row */}
+      <div className="flex items-center justify-between mt-3 pl-[10px]">
+        {/* Left side: Tag chip */}
+        <div>
+          {tag && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/10 text-brand-600 dark:text-brand-400">
+              {tag}
             </span>
           )}
         </div>
 
-        <Flag className={`w-3.5 h-3.5 ${PRIORITY_COLORS.medium} opacity-0 group-hover:opacity-100 transition-opacity`} />
+        {/* Right side: Assignee & Due Date */}
+        {(task.assignee_id || dueFormatted) && (
+          <div className="flex items-center gap-1.5">
+            {task.assignee_id && (
+              <Avatar name={`User ${task.assignee_id}`} size="xxs" />
+            )}
+            {dueFormatted && (
+              <span
+                className={`text-[11px] font-medium ${
+                  overdue
+                    ? 'text-[#EF4444] font-semibold'
+                    : 'text-surface-400 dark:text-surface-500'
+                }`}
+              >
+                {dueFormatted}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

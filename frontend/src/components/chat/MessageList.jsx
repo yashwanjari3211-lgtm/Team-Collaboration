@@ -12,10 +12,10 @@ function formatDateDivider(dateStr) {
 
   if (d.toDateString() === today.toDateString()) return 'Today'
   if (d.toDateString() === yesterday.toDateString()) return 'Yesterday'
-  return d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 }
 
-export default function MessageList({ channelName, onConvertToTask }) {
+export default function MessageList({ channelName, onConvertToTask, isTyping = false, typingUser }) {
   const messages = useSelector(state => state.messages.items)
   const loading = useSelector(state => state.messages.loading)
   const user = useSelector(state => state.auth.user)
@@ -23,7 +23,7 @@ export default function MessageList({ channelName, onConvertToTask }) {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  }, [messages, isTyping])
 
   if (loading) return <MessageSkeleton />
 
@@ -35,20 +35,21 @@ export default function MessageList({ channelName, onConvertToTask }) {
     )
   }
 
-  // Group messages by date
   let lastDate = null
 
   return (
-    <div className="flex-1 overflow-y-auto py-4">
+    <div className="flex-1 overflow-y-auto py-4 message-feed-scroll">
       {messages.map((msg, i) => {
         const msgDate = new Date(msg.created_at).toDateString()
         let dateDivider = null
         if (msgDate !== lastDate) {
           lastDate = msgDate
           dateDivider = (
-            <div className="flex items-center gap-3 px-4 my-4" key={`divider-${msgDate}`}>
+            <div className="flex items-center my-4 px-4" key={`divider-${msgDate}`}>
               <div className="flex-1 border-t border-surface-200 dark:border-surface-800" />
-              <span className="text-[11px] font-medium text-surface-400 px-2">{formatDateDivider(msg.created_at)}</span>
+              <span className="text-[11px] font-semibold text-surface-500 dark:text-surface-400 px-3 py-1 bg-white dark:bg-surface-950 border border-surface-200 dark:border-surface-800 rounded-full mx-4 shadow-sm">
+                {formatDateDivider(msg.created_at)}
+              </span>
               <div className="flex-1 border-t border-surface-200 dark:border-surface-800" />
             </div>
           )
@@ -56,6 +57,15 @@ export default function MessageList({ channelName, onConvertToTask }) {
 
         const isOwn = user?.id === msg.user_id
         const userName = isOwn ? (user?.full_name || 'You') : `User ${msg.user_id}`
+
+        // Calculate consecutive messages from the same sender within 5 minutes on same day
+        const prevMsg = i > 0 ? messages[i - 1] : null
+        const isGrouped = !!(
+          prevMsg &&
+          prevMsg.user_id === msg.user_id &&
+          new Date(msg.created_at) - new Date(prevMsg.created_at) < 5 * 60 * 1000 &&
+          new Date(msg.created_at).toDateString() === new Date(prevMsg.created_at).toDateString()
+        )
 
         return (
           <div key={msg.id}>
@@ -65,10 +75,24 @@ export default function MessageList({ channelName, onConvertToTask }) {
               isOwn={isOwn}
               userName={userName}
               onConvertToTask={onConvertToTask}
+              isGrouped={isGrouped}
             />
           </div>
         )
       })}
+
+      {/* Typing indicator */}
+      {isTyping && (
+        <div className="flex items-center gap-1.5 px-6 py-2 text-surface-400 dark:text-surface-500 text-xs italic">
+          <div className="flex gap-1 items-center mr-1">
+            <span className="w-1.5 h-1.5 bg-surface-400 dark:bg-surface-500 rounded-full animate-bounce-dot" style={{ animationDelay: '0s' }} />
+            <span className="w-1.5 h-1.5 bg-surface-400 dark:bg-surface-500 rounded-full animate-bounce-dot" style={{ animationDelay: '0.2s' }} />
+            <span className="w-1.5 h-1.5 bg-surface-400 dark:bg-surface-500 rounded-full animate-bounce-dot" style={{ animationDelay: '0.4s' }} />
+          </div>
+          <span>{typingUser || 'Someone'} is typing...</span>
+        </div>
+      )}
+
       <div ref={bottomRef} />
     </div>
   )

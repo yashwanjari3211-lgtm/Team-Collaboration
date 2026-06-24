@@ -1,7 +1,14 @@
 const COLORS = [
-  'bg-brand-500', 'bg-rose-500', 'bg-amber-500', 'bg-emerald-500',
-  'bg-cyan-500', 'bg-violet-500', 'bg-pink-500', 'bg-teal-500',
-  'bg-orange-500', 'bg-sky-500',
+  'bg-gradient-to-br from-brand-500 to-indigo-600',
+  'bg-gradient-to-br from-rose-500 to-red-650',
+  'bg-gradient-to-br from-amber-500 to-orange-600',
+  'bg-gradient-to-br from-emerald-500 to-teal-600',
+  'bg-gradient-to-br from-cyan-500 to-blue-600',
+  'bg-gradient-to-br from-violet-500 to-purple-600',
+  'bg-gradient-to-br from-pink-500 to-rose-600',
+  'bg-gradient-to-br from-teal-500 to-emerald-600',
+  'bg-gradient-to-br from-orange-500 to-red-600',
+  'bg-gradient-to-br from-sky-500 to-indigo-600',
 ]
 
 function getInitials(name) {
@@ -19,6 +26,7 @@ function getColor(name) {
 }
 
 const SIZES = {
+  xxs: 'w-5 h-5 text-[8px]',
   xs: 'w-6 h-6 text-[10px]',
   sm: 'w-8 h-8 text-xs',
   md: 'w-10 h-10 text-sm',

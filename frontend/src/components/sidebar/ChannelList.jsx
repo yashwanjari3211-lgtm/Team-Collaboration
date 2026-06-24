@@ -1,7 +1,12 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { setActiveChannel } from '../../store/channelSlice'
 import { Hash, Plus } from 'lucide-react'
-import Badge from '../common/Badge'
+
+// Mock unread messages count for demo presentation
+const MOCK_UNREADS = {
+  2: 4,
+  3: 12,
+}
 
 export default function ChannelList({ collapsed }) {
   const dispatch = useDispatch()
@@ -15,7 +20,10 @@ export default function ChannelList({ collapsed }) {
           <span className="text-[11px] font-semibold uppercase tracking-wider text-surface-400">
             Channels
           </span>
-          <button className="p-1 rounded hover-surface text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 transition-colors">
+          <button
+            className="p-1 rounded hover-surface text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 transition-colors"
+            title="New channel"
+          >
             <Plus className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -24,31 +32,37 @@ export default function ChannelList({ collapsed }) {
       <div className="space-y-0.5">
         {channels.map(channel => {
           const isActive = channel.id === activeId
+          const unreadCount = !isActive ? MOCK_UNREADS[channel.id] : null
 
           return (
             <button
               key={channel.id}
               onClick={() => dispatch(setActiveChannel(channel.id))}
-              className={`w-full flex items-center gap-2.5 rounded-lg transition-all duration-150 ${
+              className={`w-full flex items-center gap-2.5 rounded-lg transition-colors duration-100 ${
                 collapsed ? 'justify-center p-2.5' : 'px-3 py-1.5'
               } ${
                 isActive
-                  ? 'active-surface'
-                  : 'hover-surface text-surface-600 dark:text-surface-400'
+                  ? 'active-surface font-semibold text-brand-700 dark:text-brand-300'
+                  : 'hover-surface text-surface-600 dark:text-surface-400 font-medium'
               }`}
               title={collapsed ? `#${channel.name}` : undefined}
             >
-              <Hash className={`w-[16px] h-[16px] flex-shrink-0 ${
-                isActive ? 'text-brand-500' : 'text-surface-400'
-              }`} strokeWidth={2} />
+              <Hash
+                className={`w-[16px] h-[16px] flex-shrink-0 ${
+                  isActive ? 'text-brand-500' : 'text-surface-400'
+                }`}
+                strokeWidth={2}
+              />
               {!collapsed && (
                 <>
-                  <span className={`text-[13px] truncate flex-1 text-left ${
-                    isActive ? 'font-semibold' : 'font-medium'
-                  }`}>
+                  <span className="text-[13px] truncate flex-1 text-left">
                     {channel.name}
                   </span>
-                  {/* Badge for unread (mock) */}
+                  {unreadCount && (
+                    <span className="ml-auto bg-brand-500 text-white text-[10px] font-semibold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 shadow-sm shadow-brand-500/20">
+                      {unreadCount}
+                    </span>
+                  )}
                 </>
               )}
             </button>

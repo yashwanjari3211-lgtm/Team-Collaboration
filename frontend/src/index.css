@@ -25,6 +25,11 @@
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-surface-400 dark:bg-surface-600;
   }
+
+  /* Press feel for all buttons */
+  button {
+    @apply active:scale-95 transition-transform duration-100 ease-out;
+  }
 }
 
 @layer components {
@@ -57,10 +62,67 @@
   .active-surface {
     @apply bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300;
   }
+
+  /* Message content rich text rendering */
+  .message-content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+  .message-content ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+  .message-content a {
+    color: #3b82f6;
+    text-decoration: underline;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Message send slide-up animation */
+  @keyframes messageIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-message-in {
+    animation: messageIn 0.2s ease-out;
+  }
+
+  /* Scrollbar styling for message feed */
+  .message-feed-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+  .message-feed-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .message-feed-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+  }
+  .message-feed-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+  
+  /* Fallback color for dark/light scrollbar */
+  .dark .message-feed-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .message-feed-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
   }
 }
