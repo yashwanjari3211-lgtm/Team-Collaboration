@@ -17,5 +17,18 @@ services:
     ports:
       - "6379:6379"
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: saas_backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env # <-- your backend .env (incl. GOOGLE_CLIENT_ID, etc.)
+    depends_on:
+      - db
+      - redis
+
 volumes:
   postgres_data:

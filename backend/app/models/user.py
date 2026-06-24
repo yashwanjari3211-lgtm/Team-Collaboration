@@ -7,7 +7,9 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
+    hashed_password = Column(String, nullable=True)  # Nullable for Google-only users
     full_name = Column(String)
     avatar = Column(String)
+    google_id = Column(String, unique=True, nullable=True, index=True)
+    auth_provider = Column(String, default="local")  # "local" or "google"
     created_at = Column(DateTime(timezone=True), server_default=func.now())

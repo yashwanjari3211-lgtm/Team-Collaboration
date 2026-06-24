@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth, users, channels, messages, tasks, organizations, websocket
 
-app = FastAPI(title="Team Collaboration SaaS API", version="1.0.0")
+app = FastAPI(title="Team Collab API", version="1.0.0")
 
 # Middleware setup from your architecture
 # Configured to allow the React frontend to communicate with the backend

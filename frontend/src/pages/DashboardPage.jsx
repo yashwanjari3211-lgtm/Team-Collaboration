@@ -1,88 +1,100 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getMessages, sendMessage } from '../api/messages'
+import { getMessages } from '../api/messages'
 import { getTasks } from '../api/tasks'
-import { setMessages } from '../store/messageSlice'
-import { setTasks } from '../store/taskSlice'
+import { getChannels } from '../api/channels'
+import { setMessages, setMessagesLoading } from '../store/messageSlice'
+import { setTasks, setTasksLoading } from '../store/taskSlice'
+import { setChannels, setChannelsLoading } from '../store/channelSlice'
+import { setConvertingMessage } from '../store/uiSlice'
+import { setCredentials } from '../store/authSlice'
 import { useWebSocket } from '../hooks/useWebSocket'
-import { logout } from '../store/authSlice'
-import { useNavigate } from 'react-router-dom'
+import Sidebar from '../components/sidebar/Sidebar'
+import ChatPanel from '../components/chat/ChatPanel'
+import TaskPanel from '../components/tasks/TaskPanel'
+import CommandPalette from '../components/common/CommandPalette'
+import client from '../api/client'
 
 export default function DashboardPage() {
-  const [channelId] = useState(1)
-  const [messageText, setMessageText] = useState('')
   const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const messages = useSelector(state => state.messages.items)
-  const tasks = useSelector(state => state.tasks)
-  
-  useWebSocket(channelId)
+  const activeChannelId = useSelector(state => state.channels.activeId)
+  const channels = useSelector(state => state.channels.items)
+  const user = useSelector(state => state.auth.user)
 
+  // Connect WebSocket to active channel
+  useWebSocket(activeChannelId)
+
+  // Fetch user info on mount
   useEffect(() => {
-    loadData()
-  }, [])
-
-  const loadData = async () => {
-    try {
-      const [msgRes, taskRes] = await Promise.all([
-        getMessages(channelId),
-        getTasks(channelId)
-      ])
-      dispatch(setMessages(msgRes.data))
-      dispatch(setTasks(taskRes.data))
-    } catch (error) {
-      console.error(error)
+    const fetchUser = async () => {
+      try {
+        const res = await client.get('/users/me')
+        dispatch(setCredentials({
+          token: localStorage.getItem('token'),
+          user: res.data,
+        }))
+      } catch (err) {
+        console.error('Failed to fetch user:', err)
+      }
     }
-  }
+    fetchUser()
+  }, [dispatch])
 
-  const handleSend = async () => {
-    if (!messageText.trim()) return
-    await sendMessage(messageText, channelId)
-    setMessageText('')
-  }
+  // Fetch channels on mount
+  useEffect(() => {
+    const fetchChannels = async () => {
+      dispatch(setChannelsLoading(true))
+      try {
+        const res = await getChannels(1) // workspace_id = 1
+        dispatch(setChannels(res.data))
+      } catch (err) {
+        console.error('Failed to fetch channels:', err)
+      } finally {
+        dispatch(setChannelsLoading(false))
+      }
+    }
+    fetchChannels()
+  }, [dispatch])
 
-  const handleLogout = () => {
-    dispatch(logout())
-    navigate('/login')
+  // Fetch messages and tasks when active channel changes
+  useEffect(() => {
+    if (!activeChannelId) return
+
+    const fetchData = async () => {
+      dispatch(setMessagesLoading(true))
+      dispatch(setTasksLoading(true))
+      try {
+        const [msgRes, taskRes] = await Promise.all([
+          getMessages(activeChannelId),
+          getTasks(activeChannelId),
+        ])
+        dispatch(setMessages(msgRes.data))
+        dispatch(setTasks(taskRes.data))
+      } catch (err) {
+        console.error('Failed to fetch data:', err)
+      } finally {
+        dispatch(setMessagesLoading(false))
+        dispatch(setTasksLoading(false))
+      }
+    }
+    fetchData()
+  }, [activeChannelId, dispatch])
+
+  // Get active channel name
+  const activeChannel = channels.find(c => c.id === activeChannelId)
+  const channelName = activeChannel?.name || 'general'
+
+  // Chat-to-Task pipeline
+  const handleConvertToTask = (messageContent) => {
+    dispatch(setConvertingMessage(messageContent))
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="w-64 bg-gray-800 text-white p-4">
-        <h2 className="text-xl font-bold mb-4">Channels</h2>
-        <div className="bg-gray-700 p-2 rounded mb-2">#general</div>
-        <button onClick={handleLogout} className="mt-auto text-sm text-gray-400 hover:text-white">Logout</button>
-      </div>
-      <div className="flex-1 flex flex-col">
-        <div className="flex-1 overflow-y-auto p-4">
-          {messages.map(msg => (
-            <div key={msg.id} className="mb-2 p-2 bg-gray-100 rounded">
-              <p>{msg.content}</p>
-            </div>
-          ))}
-        </div>
-        <div className="p-4 border-t flex">
-          <input value={messageText} onChange={e => setMessageText(e.target.value)}
-            onKeyPress={e => e.key === 'Enter' && handleSend()}
-            className="flex-1 p-2 border rounded" placeholder="Type a message..." />
-          <button onClick={handleSend} className="ml-2 px-4 bg-blue-500 text-white rounded">Send</button>
-        </div>
-      </div>
-      <div className="w-80 bg-gray-50 p-4 border-l">
-        <h3 className="font-bold mb-4">Tasks</h3>
-        <div className="mb-4">
-          <h4 className="text-sm font-semibold text-gray-600">To Do</h4>
-          {tasks.todo.map(t => <div key={t.id} className="bg-white p-2 mb-2 rounded shadow-sm">{t.title}</div>)}
-        </div>
-        <div className="mb-4">
-          <h4 className="text-sm font-semibold text-gray-600">In Progress</h4>
-          {tasks.inProgress.map(t => <div key={t.id} className="bg-white p-2 mb-2 rounded shadow-sm">{t.title}</div>)}
-        </div>
-        <div>
-          <h4 className="text-sm font-semibold text-gray-600">Done</h4>
-          {tasks.done.map(t => <div key={t.id} className="bg-white p-2 mb-2 rounded shadow-sm">{t.title}</div>)}
-        </div>
-      </div>
+    <div className="flex h-screen overflow-hidden bg-white dark:bg-surface-950">
+      <Sidebar />
+      <ChatPanel channelName={channelName} onConvertToTask={handleConvertToTask} />
+      <TaskPanel />
+      <CommandPalette />
     </div>
   )
 }
