@@ -46,6 +46,7 @@ export default {
         'slide-in-up': 'slideInUp 0.2s ease-out',
         'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
         'skeleton': 'skeleton 1.5s ease-in-out infinite',
+        'bounce-dot': 'bounceDot 1.4s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -71,6 +72,10 @@ export default {
         skeleton: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
+        },
+        bounceDot: {
+          '0%, 80%, 100%': { transform: 'scale(0.6)', opacity: '0.4' },
+          '40%': { transform: 'scale(1)', opacity: '1' },
         },
       },
       backdropBlur: {

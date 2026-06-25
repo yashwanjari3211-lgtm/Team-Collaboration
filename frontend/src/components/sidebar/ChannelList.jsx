@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { setActiveChannel } from '../../store/channelSlice'
 import { Hash, Plus } from 'lucide-react'
+import CreateChannelModal from './CreateChannelModal'
 
 // Mock unread messages count for demo presentation
 const MOCK_UNREADS = {
@@ -12,6 +14,7 @@ export default function ChannelList({ collapsed }) {
   const dispatch = useDispatch()
   const channels = useSelector(state => state.channels.items)
   const activeId = useSelector(state => state.channels.activeId)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   return (
     <div>
@@ -21,6 +24,7 @@ export default function ChannelList({ collapsed }) {
             Channels
           </span>
           <button
+            onClick={() => setIsCreateOpen(true)}
             className="p-1 rounded hover-surface text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 transition-colors"
             title="New channel"
           >
@@ -73,6 +77,9 @@ export default function ChannelList({ collapsed }) {
           <p className="px-3 py-2 text-xs text-surface-400">No channels yet</p>
         )}
       </div>
+
+      {/* Create Channel Modal */}
+      <CreateChannelModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
     </div>
   )
 }

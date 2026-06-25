@@ -6,6 +6,9 @@ class UserCreate(BaseModel):
     password: str
     full_name: str | None = None
 
+class UserUpdate(BaseModel):
+    full_name: str | None = None
+
 class UserOut(BaseModel):
     id: int
     email: str

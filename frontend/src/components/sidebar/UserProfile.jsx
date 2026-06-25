@@ -1,13 +1,16 @@
+import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../../store/authSlice'
 import { useNavigate } from 'react-router-dom'
 import { Settings, LogOut } from 'lucide-react'
 import Avatar from '../common/Avatar'
+import UserSettingsModal from './UserSettingsModal'
 
 export default function UserProfile({ collapsed }) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const user = useSelector(state => state.auth.user)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   const handleLogout = () => {
     dispatch(logout())
@@ -21,7 +24,7 @@ export default function UserProfile({ collapsed }) {
       collapsed ? 'p-2 flex flex-col items-center gap-2' : 'p-3'
     }`}>
       <div className={`flex items-center ${collapsed ? 'flex-col gap-2' : 'gap-3'}`}>
-        <Avatar name={displayName} size="sm" presence="online" />
+        <Avatar name={displayName} src={user?.avatar} size="sm" presence="online" />
 
         {!collapsed && (
           <div className="flex-1 min-w-0">
@@ -35,6 +38,7 @@ export default function UserProfile({ collapsed }) {
         {!collapsed && (
           <div className="flex items-center gap-1">
             <button
+              onClick={() => setIsSettingsOpen(true)}
               className="p-1.5 rounded-lg hover-surface text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
               title="Settings"
             >
@@ -60,6 +64,9 @@ export default function UserProfile({ collapsed }) {
           <LogOut className="w-4 h-4" />
         </button>
       )}
+
+      {/* Settings Modal */}
+      <UserSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   )
 }

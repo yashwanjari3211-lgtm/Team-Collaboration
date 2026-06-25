@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addMessage } from '../store/messageSlice'
 
 export const useWebSocket = (roomId) => {
   const dispatch = useDispatch()
+  const user = useSelector(state => state.auth.user)
   const wsRef = useRef(null)
 
   useEffect(() => {
@@ -14,8 +15,9 @@ export const useWebSocket = (roomId) => {
       wsRef.current.close()
     }
 
-    const token = localStorage.getItem('token')
-    const ws = new WebSocket(`ws://127.0.0.1:8000/api/ws/${roomId}`)
+    const userId = user?.id || ''
+    const userName = encodeURIComponent(user?.full_name || user?.email || 'Unknown')
+    const ws = new WebSocket(`ws://127.0.0.1:8000/api/ws/${roomId}?user_id=${userId}&user_name=${userName}`)
     wsRef.current = ws
 
     ws.onopen = () => {
@@ -25,7 +27,10 @@ export const useWebSocket = (roomId) => {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
-        dispatch(addMessage(data))
+        // Only handle chat messages, ignore call signaling
+        if (data.type === 'message' || (!data.type && data.id)) {
+          dispatch(addMessage(data))
+        }
       } catch (err) {
         console.error('WebSocket message parse error:', err)
       }
@@ -43,5 +48,5 @@ export const useWebSocket = (roomId) => {
       ws.close()
       wsRef.current = null
     }
-  }, [roomId, dispatch])
+  }, [roomId, dispatch, user])
 }

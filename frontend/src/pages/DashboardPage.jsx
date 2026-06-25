@@ -14,6 +14,9 @@ import Sidebar from '../components/sidebar/Sidebar'
 import ChatPanel from '../components/chat/ChatPanel'
 import TaskPanel from '../components/tasks/TaskPanel'
 import CommandPalette from '../components/common/CommandPalette'
+import { CallProvider } from '../components/call/CallContext'
+import CallModal from '../components/call/CallModal'
+import IncomingCallOverlay from '../components/call/IncomingCallOverlay'
 import client from '../api/client'
 
 export default function DashboardPage() {
@@ -97,11 +100,15 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white dark:bg-surface-950">
-      <Sidebar />
-      <ChatPanel channelName={channelName} onConvertToTask={handleConvertToTask} />
-      <TaskPanel />
-      <CommandPalette />
-    </div>
+    <CallProvider>
+      <div className="flex h-screen overflow-hidden bg-white dark:bg-surface-950">
+        <Sidebar />
+        <ChatPanel channelName={channelName} onConvertToTask={handleConvertToTask} />
+        <TaskPanel />
+        <CommandPalette />
+        <CallModal />
+        <IncomingCallOverlay />
+      </div>
+    </CallProvider>
   )
 }

@@ -4,7 +4,7 @@ from app.database import get_db
 from app.schemas.organization import OrgCreate, OrgOut
 from app.models.organization import Organization, OrganizationMember
 from app.models.user import User
-from app.utils.dependencies import get_current_user
+from app.utils.dependencies import get_current_user, get_current_organization
 import uuid
 import re
 
@@ -31,3 +31,27 @@ def create_organization(org: OrgCreate, db: Session = Depends(get_db), current_u
 @router.get("/", response_model=list[OrgOut])
 def list_organizations(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return db.query(Organization).join(OrganizationMember).filter(OrganizationMember.user_id == current_user.id).all()
+
+@router.get("/members")
+def list_organization_members(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    org: Organization = Depends(get_current_organization),
+):
+    """List all members of the current organization with their user info."""
+    members = (
+        db.query(User.id, User.email, User.full_name, User.avatar, OrganizationMember.role)
+        .join(OrganizationMember, OrganizationMember.user_id == User.id)
+        .filter(OrganizationMember.organization_id == org.id)
+        .all()
+    )
+    return [
+        {
+            "id": m.id,
+            "email": m.email,
+            "full_name": m.full_name,
+            "avatar": m.avatar,
+            "role": m.role,
+        }
+        for m in members
+    ]
