@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { acceptInvite } from '../api/invites'
-import { Check, AlertCircle, Loader2 } from 'lucide-react'
+import { Check, AlertCircle, Loader2, ArrowRight } from 'lucide-react'
 
 export default function AcceptInvitePage() {
   const [searchParams] = useSearchParams()
@@ -58,7 +58,7 @@ export default function AcceptInvitePage() {
             <div className="w-14 h-14 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto">
               <Check className="w-7 h-7 text-emerald-400" />
             </div>
-            <h2 className="text-xl font-semibold text-white">Welcome aboard!</h2>
+            <h2 className="text-xl font-semibold text-white">Welcome to Studios!</h2>
             <p className="text-surface-400 text-sm">{message}</p>
             <p className="text-surface-500 text-xs">Redirecting to dashboard...</p>
           </>
@@ -85,7 +85,7 @@ export default function AcceptInvitePage() {
             <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto">
               <AlertCircle className="w-7 h-7 text-amber-400" />
             </div>
-            <h2 className="text-xl font-semibold text-white">Login Required</h2>
+            <h2 className="text-xl font-semibold text-white">Sign In Required</h2>
             <p className="text-surface-400 text-sm">{message}</p>
             <button
               onClick={() => navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`)}

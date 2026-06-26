@@ -24,16 +24,16 @@ export default function TaskColumn({ title, status, tasks, color }) {
 
   const handleDragOver = (e) => {
     e.preventDefault()
-    e.currentTarget.classList.add('bg-surface-50', 'dark:bg-surface-800/50')
+    e.currentTarget.classList.add('bg-surface-50', 'bg-surface-800/50')
   }
 
   const handleDragLeave = (e) => {
-    e.currentTarget.classList.remove('bg-surface-50', 'dark:bg-surface-800/50')
+    e.currentTarget.classList.remove('bg-surface-50', 'bg-surface-800/50')
   }
 
   const handleDrop = async (e) => {
     e.preventDefault()
-    e.currentTarget.classList.remove('bg-surface-50', 'dark:bg-surface-800/50')
+    e.currentTarget.classList.remove('bg-surface-50', 'bg-surface-800/50')
     const taskId = parseInt(e.dataTransfer.getData('taskId'))
     if (!taskId) return
 
@@ -67,7 +67,7 @@ export default function TaskColumn({ title, status, tasks, color }) {
       {/* Task cards */}
       <div className="space-y-2 min-h-[40px] rounded-lg p-1">
         {tasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-6 px-4 border-2 border-dashed border-surface-200 dark:border-surface-800 rounded-xl gap-2">
+          <div className="flex flex-col items-center justify-center py-6 px-4 border-2 border-dashed border-surface-700 rounded-xl gap-2">
             {/* Dashed 24px SVG circle */}
             <svg
               className="w-6 h-6 text-surface-400 dark:text-surface-600 stroke-current"
@@ -76,7 +76,7 @@ export default function TaskColumn({ title, status, tasks, color }) {
             >
               <circle cx="12" cy="12" r="9" strokeWidth="2" strokeDasharray="4 4" />
             </svg>
-            <p className="text-[12px] text-surface-400 dark:text-surface-500 text-center font-medium">
+            <p className="text-[12px] text-surface-400 text-surface-500 text-center font-medium">
               {status === 'todo' && 'No tasks yet — add one above'}
               {status === 'in_progress' && 'Drag a task here to start it'}
               {status === 'done' && 'Completed tasks will appear here'}

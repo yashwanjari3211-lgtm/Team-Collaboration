@@ -3,8 +3,8 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { login, register, forgotPassword, getGoogleAuthUrl } from '../../api/auth'
 import { setCredentials } from '../../store/authSlice'
-import { ArrowRight, Eye, EyeOff, Mail, CheckCircle } from 'lucide-react'
-import TeamCollabLogo from '../common/TeamCollabLogo'
+import { ArrowRight, Eye, EyeOff, Mail, CheckCircle, Sparkles } from 'lucide-react'
+import StudiosLogo from '../common/TeamCollabLogo'
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -86,45 +86,41 @@ export default function LoginPage() {
   if (showForgotPassword) {
     return (
       <div className="min-h-screen flex bg-surface-950">
-        {/* Left side — Hero (same as login) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-600 via-violet-600 to-brand-800" />
-          <div className="absolute inset-0 opacity-30">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-400 rounded-full blur-3xl animate-pulse-soft" />
-            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-400 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1s' }} />
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-600 via-amber-700 to-studio-800" />
+          <div className="absolute inset-0 opacity-25">
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-400 rounded-full blur-3xl animate-pulse-soft" />
+            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-studio-400 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1s' }} />
           </div>
           <div className="relative z-10 flex flex-col justify-between p-12">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <TeamCollabLogo size={22} />
+              <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+                <StudiosLogo size={22} />
               </div>
-              <span className="text-xl font-bold text-white">Team Collab</span>
+              <span className="text-xl font-bold text-white">Studios</span>
             </div>
             <div className="max-w-md">
               <h1 className="text-4xl font-bold text-white mb-4 leading-tight text-balance">
-                Reset your password<br />and get back to<br />building.
+                Reset your password<br />and get back to<br />creating.
               </h1>
               <p className="text-lg text-white/70 leading-relaxed">
                 We'll send you a secure link to create a new password for your account.
               </p>
             </div>
-            <p className="text-sm text-white/40">© 2026 Team Collab. All rights reserved.</p>
+            <p className="text-sm text-white/40">© 2026 Studios. All rights reserved.</p>
           </div>
         </div>
 
-        {/* Right side — Forgot Password Form */}
         <div className="flex-1 flex items-center justify-center px-6 py-12">
           <div className="w-full max-w-md">
-            {/* Mobile logo */}
             <div className="lg:hidden flex items-center gap-3 mb-10">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-violet-600 flex items-center justify-center shadow-lg shadow-brand-500/30">
-                <TeamCollabLogo size={22} />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-amber-600 flex items-center justify-center shadow-lg shadow-brand-500/30">
+                <StudiosLogo size={22} />
               </div>
-              <span className="text-xl font-bold text-white">Team Collab</span>
+              <span className="text-xl font-bold text-white">Studios</span>
             </div>
 
             {forgotSuccess ? (
-              /* Success state */
               <div className="animate-fade-in">
                 <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-6">
                   <CheckCircle className="w-8 h-8 text-emerald-400" />
@@ -145,10 +141,9 @@ export default function LoginPage() {
                 </button>
               </div>
             ) : (
-              /* Form state */
               <>
-                <div className="w-14 h-14 rounded-2xl bg-brand-500/10 flex items-center justify-center mb-6">
-                  <Mail className="w-7 h-7 text-brand-400" />
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-6">
+                  <Mail className="w-7 h-7 text-amber-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-1">Forgot your password?</h2>
                 <p className="text-surface-400 mb-8 text-[15px]">
@@ -168,7 +163,7 @@ export default function LoginPage() {
                       type="email"
                       value={forgotEmail}
                       onChange={e => setForgotEmail(e.target.value)}
-                      placeholder="you@company.com"
+                      placeholder="you@studio.com"
                       required
                       className="w-full px-4 py-3 rounded-xl bg-surface-900 border border-surface-700 text-white placeholder:text-surface-500 text-[14px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
                     />
@@ -176,7 +171,7 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={forgotLoading}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white font-semibold text-[14px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 mt-2"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-brand-500 to-amber-600 hover:from-brand-600 hover:to-amber-700 text-white font-semibold text-[14px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 mt-2"
                   >
                     {forgotLoading ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -203,66 +198,59 @@ export default function LoginPage() {
     )
   }
 
-  // --- Main Login / Register ---
   return (
     <div className="min-h-screen flex bg-surface-950">
       {/* Left side — Hero */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-600 via-violet-600 to-brand-800" />
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-400 rounded-full blur-3xl animate-pulse-soft" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-400 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1s' }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-600 via-amber-700 to-studio-800" />
+        <div className="absolute inset-0 opacity-25">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-400 rounded-full blur-3xl animate-pulse-soft" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-studio-400 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1s' }} />
         </div>
-
-        {/* Content */}
         <div className="relative z-10 flex flex-col justify-between p-12">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <TeamCollabLogo size={22} />
+            <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+              <StudiosLogo size={22} />
             </div>
-            <span className="text-xl font-bold text-white">Team Collab</span>
+            <span className="text-xl font-bold text-white">Studios</span>
           </div>
 
           <div className="max-w-md">
             <h1 className="text-4xl font-bold text-white mb-4 leading-tight text-balance">
-              Where teams build,<br />ship, and iterate<br />— together.
+              Where creative teams<br />build, ship, and<br />iterate—together.
             </h1>
             <p className="text-lg text-white/70 leading-relaxed">
               Real-time messaging, task management, and seamless workspace collaboration — all in one platform.
             </p>
           </div>
 
-          <p className="text-sm text-white/40">© 2026 Team Collab. All rights reserved.</p>
+          <p className="text-sm text-white/40">© 2026 Studios. All rights reserved.</p>
         </div>
       </div>
 
       {/* Right side — Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
-          {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-violet-600 flex items-center justify-center shadow-lg shadow-brand-500/30">
-              <TeamCollabLogo size={22} />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-amber-600 flex items-center justify-center shadow-lg shadow-brand-500/30">
+              <StudiosLogo size={22} />
             </div>
-            <span className="text-xl font-bold text-white">Team Collab</span>
+            <span className="text-xl font-bold text-white">Studios</span>
           </div>
 
           <h2 className="text-2xl font-bold text-white mb-1">
-            {isLogin ? 'Welcome back' : 'Create your account'}
+            {isLogin ? 'Welcome back' : 'Create your studio'}
           </h2>
           <p className="text-surface-400 mb-8 text-[15px]">
             {isLogin ? 'Sign in to continue to your workspace.' : 'Start collaborating with your team today.'}
           </p>
 
-          {/* Error */}
           {error && (
             <div className="mb-6 px-4 py-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm animate-fade-in">
               {error}
             </div>
           )}
 
-          {/* Google Sign-In Button */}
           <button
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
@@ -272,7 +260,6 @@ export default function LoginPage() {
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
-                {/* Google "G" icon */}
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
                   <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
@@ -284,7 +271,6 @@ export default function LoginPage() {
             )}
           </button>
 
-          {/* Divider */}
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-surface-800" />
@@ -295,7 +281,6 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Full Name — register only */}
             {!isLogin && (
               <div className="animate-slide-in-up">
                 <label className="block text-[13px] font-medium text-surface-300 mb-1.5">Full Name</label>
@@ -303,26 +288,24 @@ export default function LoginPage() {
                   type="text"
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
-                  placeholder="Yash Wanjari"
+                  placeholder="Your name"
                   className="w-full px-4 py-3 rounded-xl bg-surface-900 border border-surface-700 text-white placeholder:text-surface-500 text-[14px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
                 />
               </div>
             )}
 
-            {/* Email */}
             <div>
               <label className="block text-[13px] font-medium text-surface-300 mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="you@company.com"
+                placeholder="you@studio.com"
                 required
                 className="w-full px-4 py-3 rounded-xl bg-surface-900 border border-surface-700 text-white placeholder:text-surface-500 text-[14px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
               />
             </div>
 
-            {/* Password */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-[13px] font-medium text-surface-300">Password</label>
@@ -355,11 +338,10 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white font-semibold text-[14px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 mt-2"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-brand-500 to-amber-600 hover:from-brand-600 hover:to-amber-700 text-white font-semibold text-[14px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 mt-2"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -372,7 +354,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Toggle */}
           <p className="mt-8 text-center text-sm text-surface-400">
             {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
             <button

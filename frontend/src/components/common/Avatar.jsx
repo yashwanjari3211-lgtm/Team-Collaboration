@@ -1,9 +1,9 @@
 const COLORS = [
-  'bg-gradient-to-br from-brand-500 to-indigo-600',
-  'bg-gradient-to-br from-rose-500 to-red-650',
+  'bg-gradient-to-br from-brand-500 to-amber-600',
+  'bg-gradient-to-br from-rose-500 to-pink-600',
   'bg-gradient-to-br from-amber-500 to-orange-600',
   'bg-gradient-to-br from-emerald-500 to-teal-600',
-  'bg-gradient-to-br from-cyan-500 to-blue-600',
+  'bg-gradient-to-br from-studio-500 to-violet-600',
   'bg-gradient-to-br from-violet-500 to-purple-600',
   'bg-gradient-to-br from-pink-500 to-rose-600',
   'bg-gradient-to-br from-teal-500 to-emerald-600',
@@ -58,16 +58,16 @@ export default function Avatar({ name, src, size = 'md', presence, className = '
         <img
           src={src}
           alt={name}
-          className={`${sizeClass} rounded-full object-cover ring-2 ring-white dark:ring-surface-900`}
+          className={`${sizeClass} rounded-full object-cover ring-2 ring-surface-950`}
         />
       ) : (
-        <div className={`${sizeClass} ${colorClass} rounded-full flex items-center justify-center font-semibold text-white ring-2 ring-white dark:ring-surface-900`}>
+        <div className={`${sizeClass} ${colorClass} rounded-full flex items-center justify-center font-semibold text-white ring-2 ring-surface-950`}>
           {initials}
         </div>
       )}
       {presence && (
         <span
-          className={`absolute bottom-0 right-0 ${PRESENCE_SIZES[size]} ${PRESENCE_COLORS[presence]} rounded-full ring-2 ring-white dark:ring-surface-900`}
+          className={`absolute bottom-0 right-0 ${PRESENCE_SIZES[size]} ${PRESENCE_COLORS[presence]} rounded-full ring-2 ring-surface-950`}
         />
       )}
     </div>

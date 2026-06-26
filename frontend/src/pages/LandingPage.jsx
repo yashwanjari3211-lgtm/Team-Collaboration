@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Zap, ClipboardList, Building2, Lock, Globe, Code2 } from 'lucide-react'
+import { Zap, ClipboardList, Building2, Lock, Globe, Code2, Sparkles, Palette, Music } from 'lucide-react'
 import './LandingPage.css'
 
 const LandingPage = () => {
@@ -9,7 +9,6 @@ const LandingPage = () => {
   const [isAnnual, setIsAnnual] = useState(true)
   const [isIN, setIsIN] = useState(false)
   const [currency, setCurrency] = useState('$')
-  const [visibleSections, setVisibleSections] = useState(new Set())
   const observerRef = useRef(null)
 
   useEffect(() => {
@@ -24,15 +23,13 @@ const LandingPage = () => {
           setCurrency('$')
         }
       })
-      .catch(err => {
-        console.error('Geo error', err)
+      .catch(() => {
         setIsIN(false)
         setCurrency('$')
       })
   }, [])
 
   useEffect(() => {
-    // Scroll fade-in observer
     observerRef.current = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
@@ -55,7 +52,6 @@ const LandingPage = () => {
   }, [])
 
   useEffect(() => {
-    // Nav scroll effect
     const handleScroll = () => {
       const nav = document.getElementById('nav')
       nav?.classList.toggle('scrolled', window.scrollY > 20)
@@ -64,7 +60,6 @@ const LandingPage = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Pricing calculations with updated values
   const calculatePricing = (members, isINLocation, isAnnualBilling) => {
     let slackPrice, teamsPrice, tcPrice, planLabel
     
@@ -107,24 +102,7 @@ const LandingPage = () => {
     }
   }
 
-  const getPricingDetails = (isINLocation, isAnnualBilling) => {
-    const mult = isAnnualBilling ? 0.7 : 1;
-    if (isINLocation) {
-      return {
-        free: 0,
-        starter: Math.round(1499 * mult),
-        pro: Math.round(3999 * mult)
-      }
-    }
-    return {
-      free: 0,
-      starter: Math.round(19 * mult),
-      pro: Math.round(49 * mult)
-    }
-  }
-
   const pricing = calculatePricing(memberCount, isIN, isAnnual)
-  const prices = getPricingDetails(isIN, isAnnual)
 
   return (
     <div className="landing-page">
@@ -133,8 +111,8 @@ const LandingPage = () => {
         <div className="container">
           <div className="nav-inner">
             <a className="nav-logo" href="#home">
-              <div className="logo-mark">TC</div>
-              <span className="logo-text">TeamCollab</span>
+              <div className="logo-mark">S</div>
+              <span className="logo-text">Studios</span>
             </a>
             <div className="nav-links">
               <a className="nav-link" href="#features">Features</a>
@@ -162,24 +140,28 @@ const LandingPage = () => {
           <div className="hero-content">
             <div>
               <div className="hero-eyebrow fade-up">
-                <span className="eyebrow-badge">NEW</span>
-                Multi-tenant SaaS — v1.0 now live
+                <span className="eyebrow-badge"><Sparkles size={10} /></span>
+                Creative collaboration — v2.0 now live
               </div>
               <h1 className="hero-h1 fade-up" style={{transitionDelay:'.08s'}}>
-                The team workspace<br />
-                <span className="gradient-text">global teams actually use</span>
+                Where creative<br />
+                <span className="gradient-text">teams build together</span>
               </h1>
               <p className="hero-sub fade-up" style={{transitionDelay:'.16s'}}>
-                Real-time messaging, Kanban tasks, and org management — all in one place.
-                <strong> Free for up to 5 members.</strong> Fair pricing worldwide. No per-seat surprise bills.
+                Real-time messaging, Kanban tasks, and workspace management — designed for studios, agencies, and creative teams.
+                <strong> Free for up to 5 members.</strong>
               </p>
               <div className="hero-actions fade-up" style={{transitionDelay:'.22s'}}>
-                <button onClick={() => navigate('/login')} className="btn btn-primary" style={{padding:'14px 28px',fontSize:'15px'}}>Start for free</button>
-                <button className="btn btn-ghost" style={{padding:'14px 24px',fontSize:'15px'}}>Watch demo →</button>
+                <button onClick={() => navigate('/login')} className="btn btn-primary" style={{padding:'14px 28px',fontSize:'15px'}}>
+                  Start creating free
+                </button>
+                <button className="btn btn-ghost" style={{padding:'14px 24px',fontSize:'15px'}}>
+                  Watch demo →
+                </button>
               </div>
               <div className="hero-stats fade-up" style={{transitionDelay:'.3s'}}>
                 <div><div className="stat-num">1200+</div><div className="stat-label">Messages daily</div></div>
-                <div><div className="stat-num">340+</div><div className="stat-label">Teams onboarded</div></div>
+                <div><div className="stat-num">340+</div><div className="stat-label">Studios onboarded</div></div>
                 <div><div className="stat-num">99%</div><div className="stat-label">Uptime</div></div>
               </div>
             </div>
@@ -189,7 +171,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-
       {/* The Math Section */}
       <section className="math-section" id="math">
         <div className="container">
@@ -197,7 +178,7 @@ const LandingPage = () => {
             <div className="section-label fade-up"><span className="dot"></span> Pricing reality check</div>
             <h2 className="section-h2 fade-up" style={{transitionDelay:'.1s'}}>The math is<br /><span className="gradient-text">brutally simple</span></h2>
             <p className="section-sub fade-up" style={{transitionDelay:'.18s'}}>
-              Slide to your team size. See exactly what you'd pay on Slack vs TeamCollab — every month.
+              Slide to your team size. See exactly what you'd pay on Slack vs Studios — every month.
             </p>
             
             <div className="math-calculator fade-up" style={{transitionDelay:'.26s'}}>
@@ -224,9 +205,9 @@ const LandingPage = () => {
                   <div className="mc-note">per month</div>
                 </div>
                 <div className="math-card winner">
-                  <div className="mc-name" style={{color:'var(--accent2)'}}>TeamCollab ✓</div>
+                  <div className="mc-name" style={{color:'var(--gold)'}}>Studios ✓</div>
                   <div className="mc-price">{pricing.tcPrice === 0 ? `${currency}0` : `${currency}${pricing.tcPrice.toLocaleString(isIN ? 'en-IN' : 'en-US')}`}</div>
-                  <div className="mc-note" style={{color:'var(--accent2)'}}>{pricing.planLabel}</div>
+                  <div className="mc-note" style={{color:'var(--gold)'}}>{pricing.planLabel}</div>
                 </div>
               </div>
               <div className="math-saving">
@@ -242,36 +223,36 @@ const LandingPage = () => {
         <div className="container">
           <div className="features-hdr">
             <div className="section-label fade-up"><span className="dot"></span> Everything you need</div>
-            <h2 className="section-h2 fade-up" style={{transitionDelay:'.1s'}}>Built for how <span className="gradient-text">teams actually work</span></h2>
+            <h2 className="section-h2 fade-up" style={{transitionDelay:'.1s'}}>Built for <span className="gradient-text">creative workflows</span></h2>
           </div>
           <div className="bento">
             <div className="bento-card wide fade-up">
-              <div className="bento-icon"><Zap size={20} color="var(--accent2)" /></div>
+              <div className="bento-icon"><Zap size={20} /></div>
               <div className="bento-h">Real-time messaging — under 50ms latency</div>
               <div className="bento-p">Messages appear the instant you send them. No polling, no refresh. WebSocket connections keep your whole team in sync with typing indicators, reactions, and threaded replies.</div>
             </div>
             <div className="bento-card fade-up" style={{transitionDelay:'.08s'}}>
-              <div className="bento-icon"><ClipboardList size={20} color="var(--accent2)" /></div>
+              <div className="bento-icon"><Palette size={20} /></div>
               <div className="bento-h">Kanban Task Board</div>
               <div className="bento-p">Drag cards across To Do → In Progress → Done. Set priorities, assign members, and track due dates — all in the same window as your chat.</div>
             </div>
             <div className="bento-card fade-up" style={{transitionDelay:'.12s'}}>
-              <div className="bento-icon"><Building2 size={20} color="var(--accent2)" /></div>
+              <div className="bento-icon"><Building2 size={20} /></div>
               <div className="bento-h">Multi-org Isolation</div>
               <div className="bento-p">Each organisation gets a fully isolated workspace. Invite via email link. Role-based access: owner, admin, member. Data never crosses org boundaries.</div>
             </div>
             <div className="bento-card fade-up" style={{transitionDelay:'.16s'}}>
-              <div className="bento-icon"><Lock size={20} color="var(--accent2)" /></div>
+              <div className="bento-icon"><Lock size={20} /></div>
               <div className="bento-h">JWT Auth + Refresh</div>
               <div className="bento-p">Stateless, secure authentication with automatic token rotation. HTTPS enforced. bcrypt passwords. Rate-limited login endpoints.</div>
             </div>
             <div className="bento-card fade-up" style={{transitionDelay:'.2s'}}>
-              <div className="bento-icon"><Globe size={20} color="var(--accent2)" /></div>
+              <div className="bento-icon"><Globe size={20} /></div>
               <div className="bento-h">Fair Pricing Worldwide</div>
-              <div className="bento-p">Pay in your local currency via Stripe / local payments. No forex conversion fees. Plans designed around fair purchasing power worldwide.</div>
+              <div className="bento-p">Pay in your local currency via Razorpay / local payments. No forex conversion fees. Plans designed around fair purchasing power worldwide.</div>
             </div>
             <div className="bento-card fade-up" style={{transitionDelay:'.24s'}}>
-              <div className="bento-icon"><Code2 size={20} color="var(--accent2)" /></div>
+              <div className="bento-icon"><Music size={20} /></div>
               <div className="bento-h">FastAPI + React Stack</div>
               <div className="bento-p">Async Python backend, PostgreSQL, Redis. React + Redux Toolkit frontend. Open-source friendly. REST API documented at /docs.</div>
             </div>
@@ -279,7 +260,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      
       {/* Comparison Table */}
       <section className="compare-section" id="compare">
         <div className="container">
@@ -289,7 +269,7 @@ const LandingPage = () => {
               <thead>
                 <tr>
                   <th style={{textAlign: 'left'}}>FEATURE</th>
-                  <th className="tc-col">TEAMCOLLAB</th>
+                  <th className="tc-col">STUDIOS</th>
                   <th>SLACK</th>
                   <th>MS TEAMS</th>
                 </tr>
@@ -304,8 +284,8 @@ const LandingPage = () => {
                 <tr>
                   <td>₹ pricing (India)</td>
                   <td className="tc-col"><span className="c-check">✓</span> Razorpay</td>
-                  <td className="c-x">X</td>
-                  <td className="c-x">X</td>
+                  <td className="c-x">✗</td>
+                  <td className="c-x">✗</td>
                 </tr>
                 <tr>
                   <td>Real-time WebSocket</td>
@@ -316,20 +296,20 @@ const LandingPage = () => {
                 <tr>
                   <td>Built-in Kanban board</td>
                   <td className="tc-col"><span className="c-check">✓</span> Built-in</td>
-                  <td className="c-x">X Plugin only</td>
+                  <td className="c-x">✗ Plugin only</td>
                   <td className="c-warn">Planner add-on</td>
                 </tr>
                 <tr>
                   <td>Per-seat pricing</td>
                   <td className="tc-col"><span className="c-check">✓</span> Flat rate</td>
-                  <td className="c-x">X Per seat</td>
-                  <td className="c-x">X Per seat</td>
+                  <td className="c-x">✗ Per seat</td>
+                  <td className="c-x">✗ Per seat</td>
                 </tr>
                 <tr>
                   <td>No Microsoft account needed</td>
                   <td className="tc-col"><span className="c-check">✓</span></td>
                   <td className="c-check">✓</td>
-                  <td className="c-x">X</td>
+                  <td className="c-x">✗</td>
                 </tr>
                 <tr>
                   <td>Open REST API</td>
@@ -347,7 +327,6 @@ const LandingPage = () => {
       <section className="pricing-v2" id="pricing">
         <div className="container">
           <div className="pricing-boxes fade-up">
-            
             {/* India Pricing Box */}
             <div className="pricing-mega-box">
               <div className="mega-box-hdr">
@@ -459,7 +438,6 @@ const LandingPage = () => {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -470,41 +448,43 @@ const LandingPage = () => {
           <div className="qs-hdr fade-up">
             <div className="section-label"><span className="dot"></span> QUICK START</div>
             <h2 className="section-h2">Up in <span className="gradient-text">under 2 minutes</span></h2>
-            <p className="section-sub">No credit card. No lengthy onboarding. Sign up and your team is collaborating immediately.</p>
+            <p className="section-sub">No credit card. No lengthy onboarding. Sign up and your studio is collaborating immediately.</p>
           </div>
           
           <div className="qs-steps fade-up">
             <div className="qs-step">
               <div className="qs-num">1</div>
-              <h4 className="qs-h4">Create your workspace</h4>
-              <p className="qs-p">Sign up with your email, name your organisation. Your private, isolated workspace is ready in 30 seconds — no setup wizard, no IT department needed.</p>
+              <h4 className="qs-h4">Create your studio</h4>
+              <p className="qs-p">Sign up with your email, name your workspace. Your private, isolated studio is ready in 30 seconds — no setup wizard needed.</p>
             </div>
             
             <div className="qs-step">
               <div className="qs-num">2</div>
               <h4 className="qs-h4">Invite your team</h4>
-              <p className="qs-p">Share a one-click invite link or send email invitations. Team members join with one click — no account creation friction, no approval queues.</p>
+              <p className="qs-p">Share a one-click invite link or send email invitations. Team members join instantly — no account creation friction.</p>
             </div>
             
             <div className="qs-step">
               <div className="qs-num">3</div>
-              <h4 className="qs-h4">Start collaborating</h4>
+              <h4 className="qs-h4">Start creating</h4>
               <p className="qs-p">Create channels, send real-time messages, assign Kanban tasks. Every change is live for your whole team the instant it happens.</p>
             </div>
           </div>
         </div>
       </section>
 
-{/* CTA Section */}
+      {/* CTA Section */}
       <section className="cta-section">
         <div className="container">
           <div className="cta-box fade-up">
             <h2 className="cta-h">Stop paying per-seat<br /><span className="gradient-text">software invoices every month</span></h2>
             <p className="cta-sub">Your first 5 team members are free. Always. Switch takes 2 minutes.</p>
             <div className="cta-actions">
-              <button onClick={() => navigate('/login')} className="btn btn-primary" style={{padding:'16px 36px',fontSize:'16px'}}>🚀 Create your workspace — it's free</button>
+              <button onClick={() => navigate('/login')} className="btn btn-primary" style={{padding:'16px 36px',fontSize:'16px'}}>
+                🚀 Create your studio — it's free
+              </button>
             </div>
-            <div className="cta-note">No credit card · Free forever for small teams · Built for teams worldwide</div>
+            <div className="cta-note">No credit card · Free forever for small teams · Built for creative teams worldwide</div>
           </div>
         </div>
       </section>
@@ -514,8 +494,8 @@ const LandingPage = () => {
         <div className="container">
           <div className="footer-inner">
             <div className="footer-brand">
-              <div className="logo-mark" style={{width:'26px',height:'26px',fontSize:'10px'}}>TC</div>
-              TeamCollab
+              <div className="logo-mark" style={{width:'26px',height:'26px',fontSize:'10px'}}>S</div>
+              Studios
             </div>
             <div className="footer-links">
               <a href="#" className="fl">Privacy</a>
@@ -523,14 +503,13 @@ const LandingPage = () => {
               <a href="#" className="fl">Status</a>
               <a href="https://github.com" className="fl">GitHub</a>
             </div>
-            <div className="footer-copy">© 2025 TeamCollab · Made for the world</div>
+            <div className="footer-copy">© 2025 Studios · Made for creative teams</div>
           </div>
         </div>
       </footer>
     </div>
   )
 }
-
 
 const DemoWindow = () => {
   const [demoStep, setDemoStep] = useState(0);
@@ -565,7 +544,7 @@ const DemoWindow = () => {
         await new Promise(r => setTimeout(r, 600));
       }
 
-      await step(1, { name: 'Alice', color: '#6366F1' }, 1000);
+      await step(1, { name: 'Alice', color: '#e8912e' }, 1000);
       if (!isMounted) return;
       
       setDemoStep(2);
@@ -589,7 +568,7 @@ const DemoWindow = () => {
       await step(7, { name: 'Carol', color: '#10B981' }, 1000);
       if (!isMounted) return;
 
-      await step(8, { name: 'Alice', color: '#6366F1' }, 1200);
+      await step(8, { name: 'Alice', color: '#e8912e' }, 1200);
       if (!isMounted) return;
 
       await new Promise(r => setTimeout(r, 4000));
@@ -650,7 +629,7 @@ const DemoWindow = () => {
           <div className="demo-feed">
             {demoStep >= 1 && (
               <div className="demo-msg slide-in">
-                <div className="dm-av" style={{ background: '#6366F1' }}>A</div>
+                <div className="dm-av" style={{ background: '#e8912e' }}>A</div>
                 <div className="dm-content">
                   <div className="dm-name">Alice</div>
                   <div className="dm-text">Morning team! Dashboard v2 is live on staging -- please test!</div>
@@ -693,7 +672,7 @@ const DemoWindow = () => {
 
             {demoStep >= 6 && (
               <div className="demo-sys-msg fade-in">
-                Carol Singh joined the workspace
+                Carol Singh joined the studio
               </div>
             )}
 
@@ -709,7 +688,7 @@ const DemoWindow = () => {
 
             {demoStep >= 8 && (
               <div className="demo-msg slide-in">
-                <div className="dm-av" style={{ background: '#6366F1' }}>A</div>
+                <div className="dm-av" style={{ background: '#e8912e' }}>A</div>
                 <div className="dm-content">
                   <div className="dm-name">Alice</div>
                   <div className="dm-text">Welcome Carol! We are fixing a backend bug and shipping dashboard v2 today</div>
@@ -754,4 +733,3 @@ const DemoWindow = () => {
 };
 
 export default LandingPage;
-

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { resetPassword } from '../api/auth'
 import { ArrowRight, Eye, EyeOff, CheckCircle, ShieldCheck } from 'lucide-react'
-import TeamCollabLogo from '../components/common/TeamCollabLogo'
+import StudiosLogo from '../components/common/TeamCollabLogo'
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams()
@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex bg-surface-950">
       {/* Left side — Hero */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-600 via-violet-600 to-brand-800" />
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-600 via-amber-700 to-studio-800" />
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-400 rounded-full blur-3xl animate-pulse-soft" />
           <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-400 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1s' }} />
@@ -76,9 +76,9 @@ export default function ResetPasswordPage() {
         <div className="relative z-10 flex flex-col justify-between p-12">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <TeamCollabLogo size={22} />
+              <StudiosLogo size={22} />
             </div>
-            <span className="text-xl font-bold text-white">Team Collab</span>
+            <span className="text-xl font-bold text-white">Studios</span>
           </div>
           <div className="max-w-md">
             <h1 className="text-4xl font-bold text-white mb-4 leading-tight text-balance">
@@ -97,10 +97,10 @@ export default function ResetPasswordPage() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-violet-600 flex items-center justify-center shadow-lg shadow-brand-500/30">
-              <TeamCollabLogo size={22} />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-amber-600 flex items-center justify-center shadow-lg shadow-brand-500/30">
+              <StudiosLogo size={22} />
             </div>
-            <span className="text-xl font-bold text-white">Team Collab</span>
+            <span className="text-xl font-bold text-white">Studios</span>
           </div>
 
           {success ? (

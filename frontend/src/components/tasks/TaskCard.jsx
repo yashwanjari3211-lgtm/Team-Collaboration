@@ -35,7 +35,7 @@ export default function TaskCard({ task }) {
     <div
       draggable
       onDragStart={handleDragStart}
-      className={`bg-white dark:bg-surface-850 border border-surface-200 dark:border-surface-700 border-l-[3px] ${
+      className={`bg-surface-850 border border-surface-700/60 border-l-[3px] ${
         PRIORITY_BORDER_COLORS[priority]
       } rounded-lg p-3 cursor-grab active:cursor-grabbing hover:-translate-y-[2px] hover:border-brand-500 hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-150 ease-in-out group`}
     >
@@ -44,7 +44,7 @@ export default function TaskCard({ task }) {
         className={`text-[13px] font-medium leading-snug pl-[10px] ${
           task.status === 'done'
             ? 'line-through text-surface-400'
-            : 'text-surface-800 dark:text-surface-200'
+            : 'text-studio-100'
         }`}
       >
         {task.title}
@@ -62,7 +62,7 @@ export default function TaskCard({ task }) {
         {/* Left side: Tag chip */}
         <div>
           {tag && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/10 text-brand-600 dark:text-brand-400">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/10 text-brand-600 text-brand-400">
               {tag}
             </span>
           )}
@@ -79,7 +79,7 @@ export default function TaskCard({ task }) {
                 className={`text-[11px] font-medium ${
                   overdue
                     ? 'text-[#EF4444] font-semibold'
-                    : 'text-surface-400 dark:text-surface-500'
+                    : 'text-surface-400 text-surface-500'
                 }`}
               >
                 {dueFormatted}

@@ -46,8 +46,8 @@ export default function ChannelList({ collapsed }) {
                 collapsed ? 'justify-center p-2.5' : 'px-3 py-1.5'
               } ${
                 isActive
-                  ? 'active-surface font-semibold text-brand-700 dark:text-brand-300'
-                  : 'hover-surface text-surface-600 dark:text-surface-400 font-medium'
+                  ? 'active-surface font-semibold text-brand-300'
+                  : 'hover-surface text-surface-400 font-medium'
               }`}
               title={collapsed ? `#${channel.name}` : undefined}
             >
@@ -63,7 +63,7 @@ export default function ChannelList({ collapsed }) {
                     {channel.name}
                   </span>
                   {unreadCount && (
-                    <span className="ml-auto bg-brand-500 text-white text-[10px] font-semibold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 shadow-sm shadow-brand-500/20">
+                    <span className="ml-auto bg-brand-500 text-white text-[10px] font-semibold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 shadow-sm shadow-brand-500/30">
                       {unreadCount}
                     </span>
                   )}

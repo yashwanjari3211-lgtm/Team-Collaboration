@@ -118,7 +118,7 @@ export default function BillingPage() {
           email: user?.email || '',
         },
         theme: {
-          color: '#6366f1',
+          color: '#e8912e',
         },
         modal: {
           ondismiss: () => {
@@ -145,7 +145,7 @@ export default function BillingPage() {
       <div className="mx-auto max-w-6xl px-6 py-10">
         <div className="mb-8 flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-brand-300">Billing</p>
+            <p className="text-sm font-medium text-amber-400">Billing</p>
             <h1 className="mt-2 text-3xl font-bold">Choose the right plan for your workspace</h1>
             <p className="mt-2 text-sm text-surface-300">
               Pricing is selected by detected region. India sees INR pricing and everyone else sees USD pricing.
@@ -199,15 +199,15 @@ export default function BillingPage() {
                   key={market.market}
                   className={`overflow-hidden rounded-[28px] border shadow-2xl ${
                     isRecommended
-                      ? 'border-violet-500/60 bg-surface-900'
+                      ? 'border-amber-500/50 bg-surface-900'
                       : 'border-surface-800 bg-surface-900/80'
                   }`}
                 >
                   <div
                     className={`flex items-center justify-between px-7 py-5 ${
                       market.market === 'india'
-                        ? 'bg-gradient-to-r from-amber-700/30 to-emerald-700/20'
-                        : 'bg-gradient-to-r from-sky-700/20 to-indigo-700/20'
+                        ? 'bg-gradient-to-r from-amber-700/30 to-brand-700/20'
+                        : 'bg-gradient-to-r from-studio-700/20 to-brand-700/20'
                     }`}
                   >
                     <div>
@@ -228,7 +228,7 @@ export default function BillingPage() {
                           key={`${market.market}-${plan.code}`}
                           className={`rounded-2xl border p-5 ${
                             plan.is_popular
-                              ? 'border-violet-500/60 bg-violet-500/8'
+                              ? 'border-amber-500/40 bg-amber-500/8'
                               : 'border-surface-700 bg-surface-950/65'
                           }`}
                         >
@@ -259,7 +259,7 @@ export default function BillingPage() {
                           <button
                             onClick={() => handleSubscription(plan, market)}
                             disabled={isBusy || isActive || isUnavailable}
-                            className="mt-6 w-full rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-400 disabled:cursor-not-allowed disabled:bg-surface-700"
+                            className="mt-6 w-full rounded-xl bg-gradient-to-r from-brand-500 to-amber-600 hover:from-brand-600 hover:to-amber-700 px-4 py-3 text-sm font-semibold text-black transition disabled:cursor-not-allowed disabled:bg-surface-700 disabled:from-surface-700 disabled:to-surface-700 disabled:text-surface-500"
                           >
                             {isActive
                               ? 'Current Plan'

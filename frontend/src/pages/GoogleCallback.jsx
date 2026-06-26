@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { googleLogin } from '../api/auth'
 import { setCredentials } from '../store/authSlice'
-import TeamCollabLogo from '../components/common/TeamCollabLogo'
+import StudiosLogo from '../components/common/TeamCollabLogo'
 
 export default function GoogleCallback() {
   const [searchParams] = useSearchParams()
@@ -35,8 +35,8 @@ export default function GoogleCallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-950 px-6">
       <div className="w-full max-w-sm text-center">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-violet-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-brand-500/30">
-          <TeamCollabLogo size={28} />
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-amber-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-brand-500/30">
+          <StudiosLogo size={28} />
         </div>
 
         {error ? (

@@ -46,11 +46,11 @@ export default function MessageList({ channelName, onConvertToTask, isTyping = f
           lastDate = msgDate
           dateDivider = (
             <div className="flex items-center my-4 px-4" key={`divider-${msgDate}`}>
-              <div className="flex-1 border-t border-surface-200 dark:border-surface-800" />
-              <span className="text-[11px] font-semibold text-surface-500 dark:text-surface-400 px-3 py-1 bg-white dark:bg-surface-950 border border-surface-200 dark:border-surface-800 rounded-full mx-4 shadow-sm">
+              <div className="flex-1 border-t border-surface-700" />
+              <span className="text-[11px] font-semibold text-surface-500 dark:text-surface-400 px-3 py-1 bg-white dark:bg-surface-950 border border-surface-700 rounded-full mx-4 shadow-sm">
                 {formatDateDivider(msg.created_at)}
               </span>
-              <div className="flex-1 border-t border-surface-200 dark:border-surface-800" />
+              <div className="flex-1 border-t border-surface-700" />
             </div>
           )
         }
