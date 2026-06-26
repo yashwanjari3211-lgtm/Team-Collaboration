@@ -17,6 +17,8 @@ class Organization(Base):
     name = Column(String, nullable=False)
     slug = Column(String, unique=True, index=True)
     description = Column(String)
+    plan_id = Column(String, default="plan_free")  # Reference to plan ID
+    subscription_status = Column(String, default="inactive")  # inactive, active, cancelled
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class OrganizationMember(Base):

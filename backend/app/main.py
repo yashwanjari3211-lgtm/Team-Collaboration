@@ -1,7 +1,7 @@
 # backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, users, channels, messages, tasks, organizations, websocket, invites, agora
+from app.routers import auth, users, channels, messages, tasks, organizations, websocket, invites, agora, subscriptions
 
 app = FastAPI(title="Team Collab API", version="1.0.0")
 
@@ -34,6 +34,7 @@ app.include_router(tasks.router, prefix="/api/tasks", tags=["Tasks"])
 app.include_router(organizations.router, prefix="/api/organizations", tags=["Organizations"])
 app.include_router(invites.router, prefix="/api/invites", tags=["Invites"])
 app.include_router(agora.router, prefix="/api/agora", tags=["Agora"])
+app.include_router(subscriptions.router, prefix="/api/subscriptions", tags=["Subscriptions"])
 
 # WebSocket endpoints
 app.include_router(websocket.router, prefix="/api/ws", tags=["WebSockets"])

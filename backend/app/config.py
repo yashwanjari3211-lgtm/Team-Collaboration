@@ -10,9 +10,17 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = ""
     FRONTEND_URL: str = "http://localhost:5173"
 
+    # Razorpay Configuration
+    RAZORPAY_KEY_ID: str = ""
+    RAZORPAY_KEY_SECRET: str = ""
+    RAZORPAY_WEBHOOK_SECRET: str = ""
+    RAZORPAY_INR_STARTER_PLAN_ID: str = ""
+    RAZORPAY_INR_PRO_PLAN_ID: str = ""
+    RAZORPAY_USD_STARTER_PLAN_ID: str = ""
+    RAZORPAY_USD_PRO_PLAN_ID: str = ""
+
     class Config:
         env_file = ".env"
         extra = "ignore"
 
 settings = Settings()
-

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../../store/authSlice'
 import { useNavigate } from 'react-router-dom'
-import { Settings, LogOut } from 'lucide-react'
+import { Settings, LogOut, CreditCard } from 'lucide-react'
 import Avatar from '../common/Avatar'
 import UserSettingsModal from './UserSettingsModal'
 
@@ -38,6 +38,13 @@ export default function UserProfile({ collapsed }) {
         {!collapsed && (
           <div className="flex items-center gap-1">
             <button
+              onClick={() => navigate('/billing')}
+              className="p-1.5 rounded-lg hover-surface text-surface-400 hover:text-brand-400 transition-colors"
+              title="Billing"
+            >
+              <CreditCard className="w-4 h-4" />
+            </button>
+            <button
               onClick={() => setIsSettingsOpen(true)}
               className="p-1.5 rounded-lg hover-surface text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
               title="Settings"
@@ -56,13 +63,22 @@ export default function UserProfile({ collapsed }) {
       </div>
 
       {collapsed && (
-        <button
-          onClick={handleLogout}
-          className="p-1.5 rounded-lg hover-surface text-surface-400 hover:text-rose-500 transition-colors"
-          title="Log out"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
+        <>
+          <button
+            onClick={() => navigate('/billing')}
+            className="p-1.5 rounded-lg hover-surface text-surface-400 hover:text-brand-400 transition-colors"
+            title="Billing"
+          >
+            <CreditCard className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleLogout}
+            className="p-1.5 rounded-lg hover-surface text-surface-400 hover:text-rose-500 transition-colors"
+            title="Log out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </>
       )}
 
       {/* Settings Modal */}
