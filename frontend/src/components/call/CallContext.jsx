@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useRef, useCallback, useEffect } f
 import { useSelector } from 'react-redux'
 import AgoraRTC from 'agora-rtc-sdk-ng'
 import { getAgoraToken } from '../../api/agora'
+import { useGlobalWebSocket } from '../../providers/WebSocketProvider'
 
 const CallContext = createContext(null)
 
@@ -27,7 +28,6 @@ export function CallProvider({ children }) {
   const [isVideoOff, setIsVideoOff] = useState(false)
   const [isScreenSharing, setIsScreenSharing] = useState(false)
 
-  const wsRef = useRef(null)
 
   // Initialize Agora Client on mount
   useEffect(() => {
@@ -90,33 +90,13 @@ export function CallProvider({ children }) {
     }
   }, [agoraClient])
 
+  // We use the global websocket for call signaling
+  const { getWs } = useGlobalWebSocket()
+
   // Get or create WebSocket for ringing signaling (we still use this to "ring" someone before Agora connects)
   const getCallWs = useCallback(() => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      return wsRef.current
-    }
-    if (!activeChannelId || !user) return null
-
-    const ws = new WebSocket(
-      `ws://127.0.0.1:8000/api/ws/${activeChannelId}?user_id=${user.id}&user_name=${encodeURIComponent(user.full_name || user.email)}`
-    )
-    wsRef.current = ws
-
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        handleSignalingMessage(data)
-      } catch (err) {
-        console.error('Call WS parse error:', err)
-      }
-    }
-
-    ws.onclose = () => {
-      wsRef.current = null
-    }
-
-    return ws
-  }, [activeChannelId, user])
+    return getWs()
+  }, [getWs])
 
   const handleSignalingMessage = useCallback((data) => {
     switch (data.type) {
@@ -145,17 +125,23 @@ export function CallProvider({ children }) {
 
   // Update the message handler when state changes
   useEffect(() => {
-    if (wsRef.current) {
-      wsRef.current.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data)
-          handleSignalingMessage(data)
-        } catch (err) {
-          console.error('Call WS parse error:', err)
-        }
+    const ws = getWs()
+    if (!ws) return
+
+    const handleMessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        handleSignalingMessage(data)
+      } catch (err) {
+        console.error('Call WS parse error:', err)
       }
     }
-  }, [handleSignalingMessage])
+
+    ws.addEventListener('message', handleMessage)
+    return () => {
+      ws.removeEventListener('message', handleMessage)
+    }
+  }, [handleSignalingMessage, getWs])
 
   // Agora: Join channel and publish tracks
   const joinAgoraChannel = async (channelName, type) => {
@@ -359,7 +345,6 @@ export function CallProvider({ children }) {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (wsRef.current) wsRef.current.close()
       localAudioTrack?.close()
       localVideoTrack?.close()
       localScreenTrack?.close()

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Send, Copy, Check, Link2, AlertCircle } from 'lucide-react'
-import { sendInvite } from '../../api/invites'
+import { sendInvite, getGenericInvite } from '../../api/invites'
 
 export default function InviteModal({ isOpen, onClose }) {
   const [email, setEmail] = useState('')
@@ -162,7 +162,30 @@ export default function InviteModal({ isOpen, onClose }) {
               </div>
             )}
 
-            <div className="pt-1 flex justify-end">
+            <div className="pt-1 flex justify-between items-center">
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    setStatus('loading')
+                    const res = await getGenericInvite()
+                    const token = res.data.token
+                    const link = `${window.location.origin}/accept-invite?token=${token}`
+                    setInviteLink(link)
+                    setStatus('success')
+                  } catch (err) {
+                    console.error(err)
+                    setErrorMsg('Failed to generate invite link.')
+                    setStatus('error')
+                  }
+                }}
+                disabled={status === 'loading'}
+                className="px-4 py-2 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                <Link2 className="w-4 h-4" />
+                Copy generic link
+              </button>
+              
               <button
                 type="submit"
                 disabled={status === 'loading'}

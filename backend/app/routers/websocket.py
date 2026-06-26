@@ -38,7 +38,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                     "call_id": data.get("call_id"),
                 }
                 if target_user_ids:
-                    await manager.send_to_users(room_id, target_user_ids, call_data)
+                    await manager.send_to_users_global(target_user_ids, call_data)
                 else:
                     # Broadcast to everyone in room except caller
                     await manager.broadcast(room_id, call_data, exclude=websocket)
@@ -47,7 +47,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 # User accepted the call — notify the caller
                 caller_id = data.get("caller_id")
                 if caller_id:
-                    await manager.send_to_user(room_id, int(caller_id), {
+                    await manager.send_to_user_global(int(caller_id), {
                         "type": "call_accepted",
                         "accepter_id": user_info.get("user_id"),
                         "accepter_name": user_info.get("user_name"),
@@ -58,7 +58,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 # User rejected the call — notify the caller
                 caller_id = data.get("caller_id")
                 if caller_id:
-                    await manager.send_to_user(room_id, int(caller_id), {
+                    await manager.send_to_user_global(int(caller_id), {
                         "type": "call_rejected",
                         "rejecter_id": user_info.get("user_id"),
                         "rejecter_name": user_info.get("user_name"),
@@ -74,11 +74,11 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 }, exclude=websocket)
 
             elif msg_type in ("webrtc_offer", "webrtc_answer", "ice_candidate"):
-                # WebRTC signaling — forward to target user
+                # WebRTC signaling — forward to target user globally
                 target_id = data.get("target_user_id")
                 if target_id:
                     forward_data = {**data, "from_user_id": user_info.get("user_id"), "from_user_name": user_info.get("user_name")}
-                    await manager.send_to_user(room_id, int(target_id), forward_data)
+                    await manager.send_to_user_global(int(target_id), forward_data)
 
             elif msg_type == "screen_share_start":
                 await manager.broadcast(room_id, {

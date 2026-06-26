@@ -19,7 +19,10 @@ router = APIRouter()
 @router.post("/register", response_model=UserOut)
 def register(user: UserCreate, db: Session = Depends(get_db)):
     email = user.email.lower()
-    if db.query(User).filter(func.lower(User.email) == email).first():
+    existing_user = db.query(User).filter(func.lower(User.email) == email).first()
+    if existing_user:
+        if existing_user.auth_provider == "google" and not existing_user.hashed_password:
+            raise HTTPException(status_code=400, detail="This email uses Google Sign-In. Please sign in with Google.")
         raise HTTPException(status_code=400, detail="Email already registered")
     db_user = User(
         email=email,
@@ -36,17 +39,26 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 def login(credentials: LoginRequest, db: Session = Depends(get_db)):
     email = credentials.email.lower()
     user = db.query(User).filter(func.lower(User.email) == email).first()
-    if not user or not user.hashed_password or not verify_password(credentials.password, user.hashed_password):
+    
+    if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+    if user.auth_provider == "google" and not user.hashed_password:
+        raise HTTPException(status_code=401, detail="This account uses Google Sign-In. Please sign in with Google.")
+        
+    if not user.hashed_password or not verify_password(credentials.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+        
     token = create_access_token({"sub": str(user.id)})
     return TokenResponse(access_token=token)
 
 # --- Forgot Password ---
 
+from app.services.email_service import send_password_reset_email
+
 @router.post("/forgot-password")
 def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
-    """Generate a password reset token. Prints the reset link to the console
-    (in production, this would send an email)."""
+    """Generate a password reset token and send it via email."""
     user = db.query(User).filter(User.email == request.email).first()
     if not user:
         # Return success even if user not found to prevent email enumeration
@@ -56,12 +68,15 @@ def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db
         return {"message": "This account uses Google Sign-In. Please sign in with Google instead."}
 
     token = create_reset_token(request.email)
-    # In production, send this via email. For now, print to console.
     reset_url = f"http://localhost:5173/reset-password?token={token}"
-    print("\n" + "=" * 60)
-    print("🔑 PASSWORD RESET LINK (copy this into your browser):")
-    print(f"   {reset_url}")
-    print("=" * 60 + "\n")
+    
+    # Send actual email
+    success = send_password_reset_email(request.email, reset_url)
+    if not success:
+        print("\n" + "=" * 60)
+        print("🔑 PASSWORD RESET LINK (Fallback to console since email failed/not configured):")
+        print(f"   {reset_url}")
+        print("=" * 60 + "\n")
 
     return {"message": "If an account exists with that email, a reset link has been sent."}
 

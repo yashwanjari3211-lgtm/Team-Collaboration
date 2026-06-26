@@ -1,10 +1,13 @@
+import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { toggleSidebar } from '../../store/uiSlice'
+import { setActiveDm } from '../../store/channelSlice'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
 import ChannelList from './ChannelList'
 import UserProfile from './UserProfile'
 import Avatar from '../common/Avatar'
 import { AtSign, Bookmark, MessageSquare, PanelLeftClose, PanelLeft, Plus } from 'lucide-react'
+import { getOrgMembers } from '../../api/organizations'
 
 const NAV_ITEMS = [
   { icon: AtSign, label: 'Mentions & Reactions', id: 'mentions' },
@@ -12,15 +15,30 @@ const NAV_ITEMS = [
   { icon: MessageSquare, label: 'Direct Messages', id: 'dms' },
 ]
 
-const MOCK_DMS = [
-  { id: 1, name: 'Sarah Connor', presence: 'online' },
-  { id: 2, name: 'John Doe', presence: 'away' },
-  { id: 3, name: 'Alice Vance', presence: 'offline' },
-]
-
 export default function Sidebar() {
   const dispatch = useDispatch()
   const collapsed = useSelector(state => state.ui.sidebarCollapsed)
+  const currentUser = useSelector(state => state.auth.user)
+  const activeDmUserId = useSelector(state => state.channels.activeDmUserId)
+  const [members, setMembers] = useState([])
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const res = await getOrgMembers()
+        // Filter out current user
+        const otherMembers = res.data.filter(m => m.id !== currentUser?.id)
+        setMembers(otherMembers)
+      } catch (err) {
+        console.error('Failed to fetch members:', err)
+      }
+    }
+    
+    // Only fetch if we have an active org
+    if (localStorage.getItem('activeOrganizationId')) {
+      fetchMembers()
+    }
+  }, [currentUser])
 
   return (
     <aside
@@ -86,30 +104,35 @@ export default function Sidebar() {
           )}
 
           <div className="space-y-0.5">
-            {MOCK_DMS.map(dm => {
+            {members.map(member => {
+              // Mock presence for now, can be wired to real presence later
+              const presence = 'online'
               const presenceColor =
-                dm.presence === 'online'
+                presence === 'online'
                   ? 'bg-[#10B981]'
-                  : dm.presence === 'away'
+                  : presence === 'away'
                   ? 'bg-[#F59E0B]'
                   : 'bg-[#6B7280]'
 
               return (
-                <button
-                  key={dm.id}
-                  className={`w-full flex items-center gap-2.5 rounded-lg hover-surface text-surface-650 dark:text-surface-400 transition-colors ${
-                    collapsed ? 'justify-center p-2' : 'px-3 py-1.5'
-                  }`}
-                  title={collapsed ? dm.name : undefined}
-                >
+                  <button
+                    key={member.id}
+                    onClick={() => dispatch(setActiveDm({ userId: member.id, user: member }))}
+                    className={`w-full flex items-center gap-2.5 rounded-lg hover-surface transition-colors ${
+                      activeDmUserId === member.id ? 'bg-surface-100 dark:bg-surface-800 text-brand-600 dark:text-brand-400' : 'text-surface-650 dark:text-surface-400'
+                    } ${
+                      collapsed ? 'justify-center p-2' : 'px-3 py-1.5'
+                    }`}
+                    title={collapsed ? member.full_name || member.email : undefined}
+                  >
                   <div className="relative flex-shrink-0">
-                    <Avatar name={dm.name} size="xs" />
+                    <Avatar name={member.full_name || member.email} src={member.avatar} size="xs" />
                     <span
                       className={`absolute bottom-0 right-0 w-2 h-2 rounded-full border-2 border-white dark:border-surface-900 ${presenceColor}`}
                     />
                   </div>
                   {!collapsed && (
-                    <span className="text-[13px] font-medium text-left truncate flex-1">{dm.name}</span>
+                    <span className="text-[13px] font-medium text-left truncate flex-1">{member.full_name || member.email}</span>
                   )}
                 </button>
               )

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { login, register } from '../api/auth'
 import { setCredentials } from '../store/authSlice'
 
@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState('')
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -21,7 +22,12 @@ export default function LoginPage() {
       
       if (isLogin) {
         dispatch(setCredentials({ token: response.data.access_token }))
-        navigate('/dashboard')
+        const redirectUrl = searchParams.get('redirect')
+        if (redirectUrl) {
+          navigate(redirectUrl)
+        } else {
+          navigate('/dashboard')
+        }
       } else {
         setIsLogin(true)
       }

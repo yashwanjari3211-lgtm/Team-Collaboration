@@ -8,6 +8,7 @@ const uiSlice = createSlice({
     commandPaletteOpen: false,
     darkMode: true,
     convertingMessage: null, // message content to pre-fill task
+    replyingTo: null, // message object we are replying to
   },
   reducers: {
     toggleSidebar: (state) => {
@@ -36,6 +37,9 @@ const uiSlice = createSlice({
         state.taskPanelOpen = true
       }
     },
+    setReplyingTo: (state, action) => {
+      state.replyingTo = action.payload
+    },
   }
 })
 
@@ -46,5 +50,6 @@ export const {
   setCommandPaletteOpen,
   toggleDarkMode,
   setConvertingMessage,
+  setReplyingTo,
 } = uiSlice.actions
 export default uiSlice.reducer

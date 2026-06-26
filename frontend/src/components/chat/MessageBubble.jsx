@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { setReplyingTo } from '../../store/uiSlice'
 import Avatar from '../common/Avatar'
 import { SmilePlus, Reply, Forward, ListTodo } from 'lucide-react'
 
@@ -8,6 +10,7 @@ function formatTime(dateStr) {
 }
 
 export default function MessageBubble({ message, isOwn, userName, onConvertToTask, isGrouped }) {
+  const dispatch = useDispatch()
   const [reacted, setReacted] = useState(false)
 
   return (
@@ -37,9 +40,9 @@ export default function MessageBubble({ message, isOwn, userName, onConvertToTas
         <div className="text-[13.5px] leading-relaxed text-surface-800 dark:text-surface-200">
           <div dangerouslySetInnerHTML={{ __html: message.content }} className="message-content" />
           {reacted && (
-            <div className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 text-[11px] ml-2 select-none cursor-pointer hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors" onClick={() => setReacted(false)}>
-              <span className="text-[10px]">😊</span>
-              <span className="text-surface-500 font-medium">1</span>
+            <div className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded-full bg-surface-100 dark:bg-surface-800 border border-brand-200 dark:border-brand-500/30 text-[11px] select-none cursor-pointer hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors" onClick={() => setReacted(false)}>
+              <span className="text-[10px]">👍</span>
+              <span className="text-brand-600 dark:text-brand-400 font-medium">1</span>
             </div>
           )}
         </div>
@@ -53,7 +56,7 @@ export default function MessageBubble({ message, isOwn, userName, onConvertToTas
           <SmilePlus className="w-3.5 h-3.5" />
         </button>
         <button 
-          onClick={() => alert('Reply feature coming soon!')}
+          onClick={() => dispatch(setReplyingTo(message))}
           className="p-1.5 rounded-md hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors" title="Reply">
           <Reply className="w-3.5 h-3.5" />
         </button>

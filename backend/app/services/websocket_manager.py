@@ -60,6 +60,21 @@ class ConnectionManager:
         for uid in user_ids:
             await self.send_to_user(room_id, uid, message)
 
+    async def send_to_user_global(self, user_id: int, message: dict):
+        """Send a message to a specific user across all rooms."""
+        for room_id, connections in self.active_connections.items():
+            for ws, info in connections:
+                if info.get('user_id') == user_id:
+                    try:
+                        await ws.send_json(message)
+                    except Exception:
+                        pass
+
+    async def send_to_users_global(self, user_ids: List[int], message: dict):
+        """Send a message to specific users across all rooms."""
+        for uid in user_ids:
+            await self.send_to_user_global(uid, message)
+
     def get_websocket_for_user(self, room_id: str, user_id: int) -> Optional[WebSocket]:
         """Get WebSocket connection for a specific user in a room."""
         if room_id in self.active_connections:

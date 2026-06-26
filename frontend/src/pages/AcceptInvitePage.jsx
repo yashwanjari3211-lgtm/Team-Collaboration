@@ -30,6 +30,9 @@ export default function AcceptInvitePage() {
         const res = await acceptInvite(token)
         setStatus('success')
         setMessage(res.data.message || 'Invite accepted successfully!')
+        if (res.data.organization_id) {
+          localStorage.setItem('activeOrganizationId', res.data.organization_id)
+        }
         setTimeout(() => navigate('/dashboard'), 2000)
       } catch (err) {
         setStatus('error')

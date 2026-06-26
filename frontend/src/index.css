@@ -3,9 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-surface-200 dark:border-surface-700;
-  }
 
   body {
     @apply bg-surface-50 text-surface-900 dark:bg-surface-950 dark:text-surface-100;
@@ -79,6 +76,9 @@
   .message-content a {
     color: #3b82f6;
     text-decoration: underline;
+  }
+  .message-content blockquote {
+    @apply border-l-[3px] border-surface-300 dark:border-surface-600 pl-3 py-1 my-2 bg-surface-100 dark:bg-surface-800/50 rounded-r text-surface-600 dark:text-surface-400 text-[13px] italic;
   }
 
   /* @ Mention tag styling */

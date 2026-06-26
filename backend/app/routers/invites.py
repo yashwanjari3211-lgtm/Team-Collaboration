@@ -10,6 +10,8 @@ from app.utils.dependencies import get_current_user, get_current_organization, R
 
 router = APIRouter()
 
+from app.services.email_service import send_invite_email
+
 @router.post("/", response_model=InviteOut)
 def create_invite(
     invite_data: InviteCreate, 
@@ -29,12 +31,21 @@ def create_invite(
     db.commit()
     db.refresh(invite)
     
-    # Mock sending email
-    print(f"\n--- MOCK EMAIL ---")
-    print(f"To: {invite.email}")
-    print(f"Subject: You've been invited to {org.name}")
-    print(f"Link: http://localhost:5173/accept-invite?token={token}")
-    print(f"------------------\n")
+    invite_url = f"http://localhost:5173/accept-invite?token={token}"
+    
+    success = send_invite_email(
+        to_email=invite.email,
+        inviter_name=current_user.full_name or current_user.email,
+        org_name=org.name,
+        invite_url=invite_url
+    )
+    
+    if not success:
+        print(f"\n--- MOCK EMAIL ---")
+        print(f"To: {invite.email}")
+        print(f"Subject: You've been invited to {org.name}")
+        print(f"Link: {invite_url}")
+        print(f"------------------\n")
     
     return invite
 
@@ -45,7 +56,29 @@ def list_invites(
     org: Organization = Depends(get_current_organization),
     role = Depends(RoleChecker(['admin', 'owner']))
 ):
-    return db.query(Invite).filter(Invite.organization_id == org.id).all()
+    return db.query(Invite).filter(Invite.organization_id == org.id, Invite.status != 'generic').all()
+
+@router.get("/generic", response_model=InviteOut)
+def get_generic_invite(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    org: Organization = Depends(get_current_organization),
+    role = Depends(RoleChecker(['admin', 'owner']))
+):
+    invite = db.query(Invite).filter(Invite.organization_id == org.id, Invite.status == 'generic').first()
+    if not invite:
+        token = uuid.uuid4().hex
+        invite = Invite(
+            email='generic@invite.local',
+            organization_id=org.id,
+            token=token,
+            role='member',
+            status='generic'
+        )
+        db.add(invite)
+        db.commit()
+        db.refresh(invite)
+    return invite
 
 @router.post("/accept")
 def accept_invite(
@@ -53,7 +86,11 @@ def accept_invite(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    invite = db.query(Invite).filter(Invite.token == accept_data.token, Invite.status == 'pending').first()
+    invite = db.query(Invite).filter(
+        Invite.token == accept_data.token, 
+        Invite.status.in_(['pending', 'generic'])
+    ).first()
+    
     if not invite:
         raise HTTPException(status_code=400, detail="Invalid or expired invite")
         
@@ -71,7 +108,9 @@ def accept_invite(
         )
         db.add(member)
         
-    invite.status = 'accepted'
+    if invite.status == 'pending':
+        invite.status = 'accepted'
+        
     db.commit()
     
     return {"message": "Invite accepted", "organization_id": invite.organization_id}

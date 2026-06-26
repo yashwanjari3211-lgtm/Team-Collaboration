@@ -8,6 +8,8 @@ import GoogleCallback from './pages/GoogleCallback'
 import AcceptInvitePage from './pages/AcceptInvitePage'
 import LandingPage from './pages/LandingPage'
 
+import OnboardingPage from './pages/OnboardingPage'
+
 const ProtectedRoute = ({ children }) => {
   const { token } = useSelector(state => state.auth)
   return token ? children : <Navigate to="/login" />
@@ -24,6 +26,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth/google/callback" element={<GoogleCallback />} />
         <Route path="/accept-invite" element={<AcceptInvitePage />} />
+        <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/billing" element={<ProtectedRoute><BillingPage /></ProtectedRoute>} />
       </Routes>
