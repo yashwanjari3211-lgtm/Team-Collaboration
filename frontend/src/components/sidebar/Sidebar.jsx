@@ -32,7 +32,7 @@ export default function Sidebar() {
       <WorkspaceSwitcher collapsed={collapsed} />
 
       {/* Collapse toggle */}
-      <div className={`px-3 py-1 ${collapsed ? 'flex justify-center' : ''}`}>
+      <div className={`shrink-0 px-3 py-1 ${collapsed ? 'flex justify-center' : ''}`}>
         <button
           onClick={() => dispatch(toggleSidebar())}
           className="p-1.5 rounded-lg hover-surface text-surface-500 dark:text-surface-400 transition-colors"
@@ -43,7 +43,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation section */}
-      <nav className="flex-1 overflow-y-auto px-2 py-1 space-y-0.5">
+      <nav className="flex-1 min-h-0 overflow-y-auto px-2 py-1 space-y-0.5">
         {/* Quick nav items */}
         {NAV_ITEMS.map(item => {
           const Icon = item.icon

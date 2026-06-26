@@ -20,7 +20,7 @@ export default function UserProfile({ collapsed }) {
   const displayName = user?.full_name || user?.email || 'User'
 
   return (
-    <div className={`border-t border-surface-100 dark:border-surface-800 ${
+    <div className={`shrink-0 border-t border-surface-100 dark:border-surface-800 ${
       collapsed ? 'p-2 flex flex-col items-center gap-2' : 'p-3'
     }`}>
       <div className={`flex items-center ${collapsed ? 'flex-col gap-2' : 'gap-3'}`}>

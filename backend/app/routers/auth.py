@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas.auth import (
@@ -17,10 +18,11 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserOut)
 def register(user: UserCreate, db: Session = Depends(get_db)):
-    if db.query(User).filter(User.email == user.email).first():
+    email = user.email.lower()
+    if db.query(User).filter(func.lower(User.email) == email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
     db_user = User(
-        email=user.email,
+        email=email,
         hashed_password=hash_password(user.password),
         full_name=user.full_name,
         auth_provider="local",
@@ -32,7 +34,8 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 def login(credentials: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == credentials.email).first()
+    email = credentials.email.lower()
+    user = db.query(User).filter(func.lower(User.email) == email).first()
     if not user or not user.hashed_password or not verify_password(credentials.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     token = create_access_token({"sub": str(user.id)})

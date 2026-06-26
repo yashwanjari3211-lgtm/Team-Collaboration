@@ -7,7 +7,7 @@ export default function WorkspaceSwitcher({ collapsed }) {
   const [isInviteOpen, setIsInviteOpen] = useState(false)
   return (
     <div
-      className={`flex items-center gap-3 border-b border-surface-100 dark:border-surface-800 cursor-pointer transition-colors duration-150 ${
+      className={`shrink-0 flex items-center gap-3 border-b border-surface-100 dark:border-surface-800 cursor-pointer transition-colors duration-150 ${
         collapsed ? 'justify-center px-2 py-4' : 'px-4 py-4 hover:bg-surface-50 dark:hover:bg-surface-850'
       }`}
     >
