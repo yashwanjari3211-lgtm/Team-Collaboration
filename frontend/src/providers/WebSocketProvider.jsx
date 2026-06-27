@@ -44,6 +44,21 @@ export function WebSocketProvider({ children }) {
           }
         }
         
+        // Handle Kanban events
+        if (data.type === 'task_updated') {
+          // Only dispatch if the user is currently looking at this board, 
+          // or we can let boardSlice handle it (if activeBoard matches)
+          import('../store/boardSlice').then(({ updateTaskInState }) => {
+            dispatch(updateTaskInState(data.task));
+          });
+        }
+        
+        if (data.type === 'task_created') {
+          import('../store/boardSlice').then(({ addTask }) => {
+            dispatch(addTask(data.task));
+          });
+        }
+        
       } catch (err) {
         console.error('WebSocket message parse error:', err)
       }

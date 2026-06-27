@@ -1,7 +1,7 @@
 import client from './client'
 
-export const getTasks = (channel_id) => 
-  client.get('/tasks/', { params: { channel_id } })
+export const getTasks = (board_id) => 
+  client.get('/tasks/', { params: { board_id } })
 
 export const createTask = (task) => 
   client.post('/tasks/', task)

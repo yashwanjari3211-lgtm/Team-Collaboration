@@ -4,6 +4,7 @@ import { toggleSidebar } from '../../store/uiSlice'
 import { setActiveDm } from '../../store/channelSlice'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
 import ChannelList from './ChannelList'
+import BoardsList from './BoardsList'
 import UserProfile from './UserProfile'
 import Avatar from '../common/Avatar'
 import { AtSign, Bookmark, MessageSquare, PanelLeftClose, PanelLeft, Plus } from 'lucide-react'
@@ -86,6 +87,12 @@ export default function Sidebar() {
 
         {/* Channels */}
         <ChannelList collapsed={collapsed} />
+
+        {/* Divider */}
+        <div className="!my-3 border-t border-surface-100 dark:border-surface-800" />
+
+        {/* Boards */}
+        <BoardsList collapsed={collapsed} />
 
         {/* Divider */}
         <div className="!my-3 border-t border-surface-100 dark:border-surface-800" />

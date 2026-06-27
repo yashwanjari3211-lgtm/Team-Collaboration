@@ -36,6 +36,14 @@ const channelSlice = createSlice({
     addChannel: (state, action) => {
       state.items.push(action.payload)
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase('boards/setActiveBoard', (state) => {
+        state.activeId = null;
+        state.activeDmUserId = null;
+        state.activeDmUser = null;
+      });
   }
 })
 

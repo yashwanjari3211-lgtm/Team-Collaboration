@@ -2,18 +2,16 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getMessages } from '../api/messages'
-import { getTasks } from '../api/tasks'
 import { getChannels } from '../api/channels'
 import { getOrganizations } from '../api/organizations'
 import { setMessages, setMessagesLoading } from '../store/messageSlice'
-import { setTasks, setTasksLoading } from '../store/taskSlice'
 import { setChannels, setChannelsLoading, setActiveDmChannelId } from '../store/channelSlice'
 import { setConvertingMessage } from '../store/uiSlice'
 import { setCredentials } from '../store/authSlice'
 import { WebSocketProvider } from '../providers/WebSocketProvider'
 import Sidebar from '../components/sidebar/Sidebar'
 import ChatPanel from '../components/chat/ChatPanel'
-import TaskPanel from '../components/tasks/TaskPanel'
+import BoardView from '../components/boards/BoardView'
 import CommandPalette from '../components/common/CommandPalette'
 import { CallProvider } from '../components/call/CallContext'
 import CallModal from '../components/call/CallModal'
@@ -29,6 +27,8 @@ export default function DashboardPage() {
 
   const activeDmUserId = useSelector(state => state.channels.activeDmUserId)
   const activeDmUser = useSelector(state => state.channels.activeDmUser)
+  
+  const activeBoard = useSelector(state => state.boards.activeBoard)
 
   // Fetch user info on mount
   useEffect(() => {
@@ -93,25 +93,19 @@ export default function DashboardPage() {
     fetchDmChannel()
   }, [activeDmUserId, dispatch])
 
-  // Fetch messages and tasks when active public channel changes
+  // Fetch messages when active public channel changes
   useEffect(() => {
     if (!activeChannelId) return
 
     const fetchData = async () => {
       dispatch(setMessagesLoading(true))
-      dispatch(setTasksLoading(true))
       try {
-        const [msgRes, taskRes] = await Promise.all([
-          getMessages(activeChannelId),
-          getTasks(activeChannelId),
-        ])
+        const msgRes = await getMessages(activeChannelId)
         dispatch(setMessages(msgRes.data))
-        dispatch(setTasks(taskRes.data))
       } catch (err) {
-        console.error('Failed to fetch data:', err)
+        console.error('Failed to fetch messages:', err)
       } finally {
         dispatch(setMessagesLoading(false))
-        dispatch(setTasksLoading(false))
       }
     }
     fetchData()
@@ -131,8 +125,11 @@ export default function DashboardPage() {
       <CallProvider>
         <div className="flex h-screen overflow-hidden bg-white dark:bg-surface-950">
           <Sidebar />
-          <ChatPanel channelName={channelName} onConvertToTask={handleConvertToTask} />
-          <TaskPanel />
+          {activeBoard ? (
+            <BoardView />
+          ) : (
+            <ChatPanel channelName={channelName} onConvertToTask={handleConvertToTask} />
+          )}
           <CommandPalette />
           <CallModal />
           <IncomingCallOverlay />
