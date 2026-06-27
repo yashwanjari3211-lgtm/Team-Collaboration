@@ -11,6 +11,7 @@ class TaskCreate(BaseModel):
     due_date: Optional[datetime] = None
     priority: Optional[str] = 'medium'
     order: Optional[int] = 0
+    labels: Optional[str] = None
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
@@ -21,6 +22,21 @@ class TaskUpdate(BaseModel):
     due_date: Optional[datetime] = None
     priority: Optional[str] = None
     order: Optional[int] = None
+    labels: Optional[str] = None
+
+class TaskCommentCreate(BaseModel):
+    content: str
+
+class TaskCommentOut(BaseModel):
+    id: int
+    task_id: int
+    user_id: int
+    content: str
+    created_at: datetime
+    updated_at: datetime
+    
+    class Config:
+        from_attributes = True
 
 class TaskOut(BaseModel):
     id: int
@@ -33,8 +49,14 @@ class TaskOut(BaseModel):
     priority: str
     order: int
     due_date: Optional[datetime]
+    labels: Optional[str]
     created_at: datetime
     updated_at: datetime
 
     class Config:
         from_attributes = True
+
+class TaskPositionUpdate(BaseModel):
+    id: int
+    column_id: int
+    order: int

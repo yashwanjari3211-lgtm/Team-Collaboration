@@ -45,13 +45,16 @@ def list_organization_members(
         .filter(OrganizationMember.organization_id == org.id)
         .all()
     )
-    return [
-        {
-            "id": m.id,
-            "email": m.email,
-            "full_name": m.full_name,
-            "avatar": m.avatar,
-            "role": m.role,
-        }
-        for m in members
-    ]
+    seen_users = set()
+    unique_members = []
+    for m in members:
+        if m.id not in seen_users:
+            seen_users.add(m.id)
+            unique_members.append({
+                "id": m.id,
+                "email": m.email,
+                "full_name": m.full_name,
+                "avatar": m.avatar,
+                "role": m.role,
+            })
+    return unique_members

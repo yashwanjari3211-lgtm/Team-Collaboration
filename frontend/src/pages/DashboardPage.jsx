@@ -12,6 +12,7 @@ import { WebSocketProvider } from '../providers/WebSocketProvider'
 import Sidebar from '../components/sidebar/Sidebar'
 import ChatPanel from '../components/chat/ChatPanel'
 import BoardView from '../components/boards/BoardView'
+import TaskPanel from '../components/tasks/TaskPanel'
 import CommandPalette from '../components/common/CommandPalette'
 import { CallProvider } from '../components/call/CallContext'
 import CallModal from '../components/call/CallModal'
@@ -111,9 +112,17 @@ export default function DashboardPage() {
     fetchData()
   }, [activeChannelId, dispatch])
 
+  const filter = useSelector(state => state.messages.filter || 'all')
+
   // Get active channel name (or DM username)
   const activeChannel = channels.find(c => c.id === activeChannelId)
-  const channelName = activeDmUser ? activeDmUser.full_name || activeDmUser.email : (activeChannel?.name || 'general')
+  const channelName = filter === 'mentions'
+    ? 'Mentions & Reactions'
+    : filter === 'saved'
+    ? 'Saved Items'
+    : activeDmUser
+    ? activeDmUser.full_name || activeDmUser.email
+    : (activeChannel?.name || 'general')
 
   // Chat-to-Task pipeline
   const handleConvertToTask = (messageContent) => {
@@ -130,6 +139,7 @@ export default function DashboardPage() {
           ) : (
             <ChatPanel channelName={channelName} onConvertToTask={handleConvertToTask} />
           )}
+          <TaskPanel />
           <CommandPalette />
           <CallModal />
           <IncomingCallOverlay />

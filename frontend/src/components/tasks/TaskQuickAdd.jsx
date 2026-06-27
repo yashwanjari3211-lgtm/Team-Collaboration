@@ -5,9 +5,8 @@ import { setConvertingMessage } from '../../store/uiSlice'
 import { createTask } from '../../api/tasks'
 import { Plus, X } from 'lucide-react'
 
-export default function TaskQuickAdd() {
+export default function TaskQuickAdd({ targetBoard }) {
   const dispatch = useDispatch()
-  const activeChannelId = useSelector(state => state.channels.activeId)
   const convertingMessage = useSelector(state => state.ui.convertingMessage)
   const [title, setTitle] = useState('')
   const [adding, setAdding] = useState(false)
@@ -18,12 +17,21 @@ export default function TaskQuickAdd() {
   const handleSubmit = async (e) => {
     e?.preventDefault()
     const taskTitle = displayTitle.trim()
-    if (!taskTitle || !activeChannelId) return
+    if (!taskTitle || !targetBoard || !targetBoard.columns || targetBoard.columns.length === 0) return
 
     setAdding(true)
     try {
-      const res = await createTask({ title: taskTitle, channel_id: activeChannelId })
-      dispatch(addTask(res.data))
+      // Add to the first column by default
+      const firstColumn = targetBoard.columns[0]
+      const res = await createTask({ 
+        title: taskTitle, 
+        board_id: targetBoard.id,
+        column_id: firstColumn.id,
+        priority: 'medium',
+        order: firstColumn.tasks?.length || 0
+      })
+      // Dispatch addTask from boardSlice!
+      dispatch({ type: 'boards/addTask', payload: res.data })
       setTitle('')
       dispatch(setConvertingMessage(null))
     } catch (err) {

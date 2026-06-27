@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import ChatHeader from './ChatHeader'
 import MessageList from './MessageList'
 import MessageInput from './MessageInput'
@@ -6,6 +7,7 @@ import MessageInput from './MessageInput'
 export default function ChatPanel({ channelName, onConvertToTask }) {
   const [isTyping, setIsTyping] = useState(false)
   const [typingUser, setTypingUser] = useState('Sarah Connor')
+  const filter = useSelector(state => state.messages.filter || 'all')
 
   useEffect(() => {
     // Show typing simulation periodically for UX presentation
@@ -25,7 +27,7 @@ export default function ChatPanel({ channelName, onConvertToTask }) {
         isTyping={isTyping}
         typingUser={typingUser}
       />
-      <MessageInput channelName={channelName} />
+      {filter === 'all' && <MessageInput channelName={channelName} />}
     </div>
   )
 }

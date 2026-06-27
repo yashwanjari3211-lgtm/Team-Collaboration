@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { ChevronDown, ChevronRight, Hash, Plus, Trello } from 'lucide-react'
-import { fetchBoards, setActiveBoard } from '../../store/boardSlice'
+import { ChevronDown, ChevronRight, Hash, Plus, KanbanSquare } from 'lucide-react'
+import { fetchBoards, setActiveBoard, createBoardThunk } from '../../store/boardSlice'
 
 export default function BoardsList({ collapsed }) {
   const dispatch = useDispatch()
@@ -19,8 +19,16 @@ export default function BoardsList({ collapsed }) {
   if (collapsed) {
     return (
       <div className="flex flex-col items-center gap-2 py-2">
-        <button className="p-2 rounded-lg hover-surface text-surface-500 hover:text-surface-600 transition-colors" title="Boards">
-          <Trello className="w-5 h-5" />
+        <button 
+          onClick={() => {
+            if (boards.length > 0) {
+              dispatch(setActiveBoard(boards[0]));
+            }
+          }}
+          className="p-2 rounded-lg hover-surface text-surface-500 hover:text-surface-600 transition-colors" 
+          title="Boards"
+        >
+          <KanbanSquare className="w-5 h-5" />
         </button>
       </div>
     )
@@ -37,7 +45,16 @@ export default function BoardsList({ collapsed }) {
           {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
           Boards
         </button>
-        <button className="p-1 rounded hover-surface text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 transition-colors opacity-0 group-hover:opacity-100" title="Create Board">
+        <button
+          onClick={() => {
+            const name = prompt('Enter new board name:')
+            if (name && name.trim()) {
+              dispatch(createBoardThunk({ name: name.trim() }))
+            }
+          }}
+          className="p-1 rounded hover-surface text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 transition-colors opacity-0 group-hover:opacity-100" 
+          title="Create Board"
+        >
           <Plus className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -57,7 +74,7 @@ export default function BoardsList({ collapsed }) {
                   : 'text-surface-600 dark:text-surface-400'
               }`}
             >
-              <Trello className={`w-4 h-4 flex-shrink-0 ${activeBoard?.id === board.id ? 'text-brand-500' : 'text-surface-400'}`} />
+              <KanbanSquare className={`w-4 h-4 flex-shrink-0 ${activeBoard?.id === board.id ? 'text-brand-500' : 'text-surface-400'}`} />
               <span className="text-[13px] truncate text-left">{board.name}</span>
             </button>
           ))}

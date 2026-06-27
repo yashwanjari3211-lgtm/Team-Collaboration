@@ -17,20 +17,37 @@ function formatDateDivider(dateStr) {
 
 export default function MessageList({ channelName, onConvertToTask, isTyping = false, typingUser }) {
   const messages = useSelector(state => state.messages.items)
+  const filter = useSelector(state => state.messages.filter || 'all')
   const loading = useSelector(state => state.messages.loading)
   const user = useSelector(state => state.auth.user)
   const bottomRef = useRef(null)
 
+  let filteredMessages = messages
+  if (filter === 'mentions') {
+    const nameQuery = user?.full_name || user?.email || ''
+    filteredMessages = messages.filter(msg => 
+      msg.content.includes('@') && 
+      (msg.content.toLowerCase().includes(nameQuery.toLowerCase()) || msg.content.toLowerCase().includes('all'))
+    )
+  } else if (filter === 'saved') {
+    // Show messages that are bookmarked/saved (in our mock case, messages containing link, attachment or own messages)
+    filteredMessages = messages.filter(msg => 
+      msg.content.includes('Attached') || msg.content.includes('http') || msg.content.includes('href')
+    )
+  } else if (filter === 'dms') {
+    filteredMessages = []
+  }
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, isTyping])
+  }, [filteredMessages, isTyping])
 
   if (loading) return <MessageSkeleton />
 
-  if (messages.length === 0) {
+  if (filteredMessages.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <EmptyState type="messages" channelName={channelName} />
+        <EmptyState type={filter === 'dms' ? 'dms' : 'messages'} channelName={channelName} />
       </div>
     )
   }
@@ -39,7 +56,7 @@ export default function MessageList({ channelName, onConvertToTask, isTyping = f
 
   return (
     <div className="flex-1 overflow-y-auto py-4 message-feed-scroll">
-      {messages.map((msg, i) => {
+      {filteredMessages.map((msg, i) => {
         const msgDate = new Date(msg.created_at).toDateString()
         let dateDivider = null
         if (msgDate !== lastDate) {
@@ -56,10 +73,12 @@ export default function MessageList({ channelName, onConvertToTask, isTyping = f
         }
 
         const isOwn = user?.id === msg.user_id
-        const userName = isOwn ? (user?.full_name || 'You') : `User ${msg.user_id}`
+        const userName = isOwn 
+          ? (user?.full_name || 'You') 
+          : (msg.user?.full_name || msg.user?.email || `User ${msg.user_id}`)
 
         // Calculate consecutive messages from the same sender within 5 minutes on same day
-        const prevMsg = i > 0 ? messages[i - 1] : null
+        const prevMsg = i > 0 ? filteredMessages[i - 1] : null
         const isGrouped = !!(
           prevMsg &&
           prevMsg.user_id === msg.user_id &&

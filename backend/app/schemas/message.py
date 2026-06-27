@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from app.schemas.user import UserOut
 
 class MessageCreate(BaseModel):
     content: str
@@ -12,6 +13,7 @@ class MessageOut(BaseModel):
     user_id: int
     organization_id: int
     created_at: datetime
+    user: UserOut | None = None
 
     class Config:
         from_attributes = True

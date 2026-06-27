@@ -19,7 +19,7 @@ def create_channel(channel: ChannelCreate, db: Session = Depends(get_db), curren
 
 @router.get("/", response_model=list[ChannelOut])
 def list_channels(db: Session = Depends(get_db), current_user: User = Depends(get_current_user), org: Organization = Depends(get_current_organization)):
-    return db.query(Channel).filter(Channel.organization_id == org.id).all()
+    return db.query(Channel).filter(Channel.organization_id == org.id, ~Channel.name.startswith("dm_")).all()
 
 @router.delete("/{channel_id}")
 def delete_channel(channel_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user), org: Organization = Depends(get_current_organization), role = Depends(RoleChecker(['admin', 'owner']))):

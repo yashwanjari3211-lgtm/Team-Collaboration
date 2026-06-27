@@ -24,6 +24,10 @@ export default function EmptyState({ type = 'messages', channelName = '', classN
       title: 'No channels',
       subtitle: 'Create a channel to start collaborating.',
     },
+    dms: {
+      title: 'Direct Messages',
+      subtitle: 'Select a member under the "Direct Messages" section in the sidebar to start a private conversation.',
+    },
   }
 
   const { title, subtitle } = texts[type] || texts.messages

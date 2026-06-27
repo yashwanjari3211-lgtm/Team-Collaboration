@@ -7,6 +7,11 @@ export const fetchBoards = createAsyncThunk('boards/fetchBoards', async () => {
   return response.data;
 });
 
+export const createBoardThunk = createAsyncThunk('boards/createBoardThunk', async (boardData) => {
+  const response = await createBoard(boardData);
+  return response.data;
+});
+
 export const fetchBoardDetails = createAsyncThunk('boards/fetchBoardDetails', async (boardId) => {
   const [boardRes, tasksRes] = await Promise.all([
     getBoard(boardId),
@@ -93,12 +98,23 @@ const boardSlice = createSlice({
               if (destCol) {
                 if (!destCol.tasks) destCol.tasks = [];
                 destCol.tasks.push(updatedTask);
+                destCol.tasks.sort((a, b) => (a.order || 0) - (b.order || 0));
               }
             } else {
               col.tasks[idx] = updatedTask;
+              col.tasks.sort((a, b) => (a.order || 0) - (b.order || 0));
             }
             break;
           }
+        }
+      }
+    },
+    removeTaskFromState: (state, action) => {
+      if (state.activeBoard) {
+        const { taskId, columnId } = action.payload;
+        const col = state.activeBoard.columns.find(c => c.id === columnId);
+        if (col && col.tasks) {
+          col.tasks = col.tasks.filter(t => t.id !== taskId);
         }
       }
     }
@@ -112,6 +128,10 @@ const boardSlice = createSlice({
         state.loading = false;
         state.items = action.payload;
       })
+      .addCase(createBoardThunk.fulfilled, (state, action) => {
+        state.items.push(action.payload);
+        state.activeBoard = action.payload;
+      })
       .addCase(fetchBoardDetails.pending, (state) => {
         state.loading = true;
       })
@@ -124,6 +144,11 @@ const boardSlice = createSlice({
         });
         state.activeBoard = board;
       })
+      .addCase(fetchBoardDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+        console.error("fetchBoardDetails failed:", action.error);
+      })
       .addCase('channels/setActiveChannel', (state) => {
         state.activeBoard = null;
       })
@@ -133,5 +158,6 @@ const boardSlice = createSlice({
   },
 });
 
-export const { setBoards, setActiveBoard, moveTask, addColumn, addTask, updateTaskInState } = boardSlice.actions;
+export const { setBoards, setActiveBoard, moveTask, addColumn, addTask, updateTaskInState, removeTaskFromState } = boardSlice.actions;
+export { createBoardThunk };
 export default boardSlice.reducer;

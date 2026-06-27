@@ -5,6 +5,7 @@ const messageSlice = createSlice({
   initialState: {
     items: [],
     loading: false,
+    filter: 'all', // 'all' | 'mentions' | 'saved' | 'dms'
   },
   reducers: {
     setMessages: (state, action) => {
@@ -19,8 +20,11 @@ const messageSlice = createSlice({
     setMessagesLoading: (state, action) => {
       state.loading = action.payload
     },
+    setFilter: (state, action) => {
+      state.filter = action.payload
+    }
   }
 })
 
-export const { setMessages, addMessage, setMessagesLoading } = messageSlice.actions
+export const { setMessages, addMessage, setMessagesLoading, setFilter } = messageSlice.actions
 export default messageSlice.reducer

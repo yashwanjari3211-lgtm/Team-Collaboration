@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import KanbanCard from './KanbanCard';
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createTask } from '../../api/tasks';
 import { addTask } from '../../store/boardSlice';
@@ -12,20 +12,15 @@ export default function KanbanColumn({ column, onTaskClick }) {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const activeBoard = useSelector(state => state.boards.activeBoard);
 
-  const handleAddTask = async (e) => {
-    e.preventDefault();
-    if (!newTaskTitle.trim()) {
-      setIsAdding(false);
-      return;
-    }
-
+  const handleCreateTask = async () => {
+    if (!newTaskTitle.trim() || !activeBoard) return;
     try {
       const res = await createTask({
-        title: newTaskTitle,
+        title: newTaskTitle.trim(),
         board_id: activeBoard.id,
         column_id: column.id,
-        priority: 'medium',
-        order: column.tasks ? column.tasks.length : 0
+        order: column.tasks?.length || 0,
+        priority: 'medium'
       });
       dispatch(addTask(res.data));
       setNewTaskTitle('');
@@ -36,17 +31,18 @@ export default function KanbanColumn({ column, onTaskClick }) {
   };
 
   return (
-    <div className="flex-shrink-0 w-80 flex flex-col bg-surface-100 dark:bg-surface-800/50 rounded-2xl border border-surface-200 dark:border-surface-800 max-h-full">
-      <div className="p-4 flex items-center justify-between border-b border-surface-200 dark:border-surface-800">
-        <h3 className="font-semibold text-surface-900 dark:text-surface-100 flex items-center gap-2">
-          {column.name}
-          <span className="bg-surface-200 dark:bg-surface-700 text-surface-600 dark:text-surface-300 text-xs px-2 py-0.5 rounded-full">
+    <div className="w-[300px] flex-shrink-0 flex flex-col bg-surface-50 dark:bg-surface-950/50 rounded-xl border border-surface-200 dark:border-surface-800 max-h-full overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between p-3 border-b border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-100">{column.name}</h3>
+          <span className="bg-surface-100 dark:bg-surface-800 text-surface-500 text-xs font-medium px-2 py-0.5 rounded-full">
             {column.tasks?.length || 0}
           </span>
-        </h3>
+        </div>
         <button 
           onClick={() => setIsAdding(true)}
-          className="p-1.5 rounded-lg hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-500 transition-colors"
+          className="text-surface-400 hover:text-surface-600 transition-colors p-1 hover:bg-surface-100 dark:hover:bg-surface-800 rounded"
         >
           <Plus className="w-4 h-4" />
         </button>
@@ -71,31 +67,46 @@ export default function KanbanColumn({ column, onTaskClick }) {
                 />
               ))}
               {provided.placeholder}
+              
+              {isAdding && (
+                <div className="bg-white dark:bg-surface-900 p-3 rounded-xl shadow-sm border border-brand-300 dark:border-brand-500/50 mt-3">
+                  <textarea
+                    autoFocus
+                    className="w-full text-sm bg-transparent border-none focus:outline-none resize-none text-surface-900 dark:text-surface-100 placeholder-surface-400"
+                    placeholder="What needs to be done?"
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleCreateTask();
+                      }
+                      if (e.key === 'Escape') setIsAdding(false);
+                    }}
+                    rows={2}
+                  />
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-surface-100 dark:border-surface-800">
+                    <button 
+                      onClick={handleCreateTask}
+                      className="text-xs bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 rounded-lg transition-colors font-medium"
+                    >
+                      Add Task
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setIsAdding(false);
+                        setNewTaskTitle('');
+                      }}
+                      className="p-1.5 text-surface-400 hover:text-surface-600 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </Droppable>
-
-        {isAdding && (
-          <form onSubmit={handleAddTask} className="mt-3 bg-white dark:bg-surface-900 p-3 rounded-xl shadow-sm border border-brand-200 dark:border-brand-500/30">
-            <input
-              autoFocus
-              type="text"
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              placeholder="Task title..."
-              className="w-full bg-transparent text-sm focus:outline-none mb-2"
-              onBlur={handleAddTask}
-            />
-            <div className="flex gap-2">
-              <button type="submit" className="px-3 py-1 bg-brand-500 text-white text-xs font-medium rounded-lg hover:bg-brand-600">
-                Add
-              </button>
-              <button type="button" onClick={() => setIsAdding(false)} className="px-3 py-1 text-surface-500 hover:text-surface-700 text-xs font-medium">
-                Cancel
-              </button>
-            </div>
-          </form>
-        )}
       </div>
     </div>
   );

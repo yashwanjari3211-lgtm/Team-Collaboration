@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addMessage } from '../store/messageSlice'
+import { addTask, updateTaskInState, removeTaskFromState } from '../store/boardSlice'
 
 const WebSocketContext = createContext(null)
 
@@ -25,7 +26,9 @@ export function WebSocketProvider({ children }) {
     // Connect to the organization-wide WebSocket
     const userId = user.id
     const userName = encodeURIComponent(user.full_name || user.email || 'Unknown')
-    const ws = new WebSocket(`ws://127.0.0.1:8000/api/ws/org_${activeOrgId}?user_id=${userId}&user_name=${userName}`)
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const host = window.location.hostname
+    const ws = new WebSocket(`${protocol}//${host}:8000/api/ws/org_${activeOrgId}?user_id=${userId}&user_name=${userName}`)
     wsRef.current = ws
 
     ws.onopen = () => {
@@ -39,24 +42,22 @@ export function WebSocketProvider({ children }) {
         // Handle incoming chat messages
         if (data.type === 'message' || (!data.type && data.id)) {
           // Only dispatch if the message belongs to our currently active channel
-          if (data.channel_id === activeChannelRef.current) {
+          if (String(data.channel_id) === String(activeChannelRef.current)) {
             dispatch(addMessage(data))
           }
         }
         
         // Handle Kanban events
         if (data.type === 'task_updated') {
-          // Only dispatch if the user is currently looking at this board, 
-          // or we can let boardSlice handle it (if activeBoard matches)
-          import('../store/boardSlice').then(({ updateTaskInState }) => {
-            dispatch(updateTaskInState(data.task));
-          });
+          dispatch(updateTaskInState(data.task));
         }
         
         if (data.type === 'task_created') {
-          import('../store/boardSlice').then(({ addTask }) => {
-            dispatch(addTask(data.task));
-          });
+          dispatch(addTask(data.task));
+        }
+        
+        if (data.type === 'task_deleted') {
+          dispatch(removeTaskFromState({ taskId: data.task_id, columnId: data.column_id }));
         }
         
       } catch (err) {

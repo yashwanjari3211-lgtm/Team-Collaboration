@@ -37,12 +37,10 @@ export default function TaskColumn({ title, status, tasks, color }) {
     const taskId = parseInt(e.dataTransfer.getData('taskId'))
     if (!taskId) return
 
-    // Optimistic update
-    dispatch(moveTask({ taskId, newStatus: status }))
-
     // Persist to backend
     try {
-      await updateTask(taskId, { status })
+      const res = await updateTask(taskId, { column_id: columnId })
+      dispatch({ type: 'boards/updateTaskInState', payload: res.data })
     } catch (err) {
       console.error('Failed to update task status:', err)
     }
@@ -77,9 +75,7 @@ export default function TaskColumn({ title, status, tasks, color }) {
               <circle cx="12" cy="12" r="9" strokeWidth="2" strokeDasharray="4 4" />
             </svg>
             <p className="text-[12px] text-surface-400 text-surface-500 text-center font-medium">
-              {status === 'todo' && 'No tasks yet — add one above'}
-              {status === 'in_progress' && 'Drag a task here to start it'}
-              {status === 'done' && 'Completed tasks will appear here'}
+              Drop tasks here
             </p>
           </div>
         ) : (

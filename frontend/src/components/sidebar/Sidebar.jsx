@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { toggleSidebar } from '../../store/uiSlice'
 import { setActiveDm } from '../../store/channelSlice'
+import { setFilter } from '../../store/messageSlice'
+import { setActiveBoard } from '../../store/boardSlice'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
 import ChannelList from './ChannelList'
 import BoardsList from './BoardsList'
@@ -21,6 +23,7 @@ export default function Sidebar() {
   const collapsed = useSelector(state => state.ui.sidebarCollapsed)
   const currentUser = useSelector(state => state.auth.user)
   const activeDmUserId = useSelector(state => state.channels.activeDmUserId)
+  const messageFilter = useSelector(state => state.messages.filter || 'all')
   const [members, setMembers] = useState([])
 
   useEffect(() => {
@@ -66,17 +69,26 @@ export default function Sidebar() {
         {/* Quick nav items */}
         {NAV_ITEMS.map(item => {
           const Icon = item.icon
+          const isActive = messageFilter === item.id
           return (
             <button
               key={item.id}
-              className={`w-full flex items-center gap-3 rounded-lg hover-surface transition-colors ${
+              onClick={() => {
+                dispatch(setFilter(item.id))
+                dispatch(setActiveBoard(null)) // Reset board to show ChatPanel
+              }}
+              className={`w-full flex items-center gap-3 rounded-lg transition-colors ${
+                isActive 
+                  ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold' 
+                  : 'hover-surface text-surface-600 dark:text-surface-400'
+              } ${
                 collapsed ? 'justify-center p-2.5' : 'px-3 py-2'
               }`}
               title={collapsed ? item.label : undefined}
             >
-              <Icon className="w-[18px] h-[18px] text-surface-500 dark:text-surface-400 flex-shrink-0" strokeWidth={1.8} />
+              <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? 'text-brand-500' : 'text-surface-500 dark:text-surface-400'}`} strokeWidth={1.8} />
               {!collapsed && (
-                <span className="text-[13px] font-medium text-surface-600 dark:text-surface-300 truncate">{item.label}</span>
+                <span className="text-[13px] font-medium truncate">{item.label}</span>
               )}
             </button>
           )
@@ -124,7 +136,10 @@ export default function Sidebar() {
               return (
                   <button
                     key={member.id}
-                    onClick={() => dispatch(setActiveDm({ userId: member.id, user: member }))}
+                    onClick={() => {
+                      dispatch(setActiveDm({ userId: member.id, user: member }))
+                      dispatch(setFilter('all'))
+                    }}
                     className={`w-full flex items-center gap-2.5 rounded-lg hover-surface transition-colors ${
                       activeDmUserId === member.id ? 'bg-surface-100 dark:bg-surface-800 text-brand-600 dark:text-brand-400' : 'text-surface-650 dark:text-surface-400'
                     } ${

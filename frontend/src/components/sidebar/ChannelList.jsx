@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { setActiveChannel } from '../../store/channelSlice'
+import { setFilter } from '../../store/messageSlice'
 import { Hash, Plus } from 'lucide-react'
 import CreateChannelModal from './CreateChannelModal'
 
@@ -15,6 +16,23 @@ export default function ChannelList({ collapsed }) {
   const channels = useSelector(state => state.channels.items)
   const activeId = useSelector(state => state.channels.activeId)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  if (collapsed) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-2">
+        <button 
+          onClick={() => {
+            if (channels.length > 0) {
+              dispatch(setActiveChannel(channels[0].id));
+            }
+          }}
+          className="p-2 rounded-lg hover-surface text-surface-500 hover:text-surface-600 transition-colors" 
+          title="Channels"
+        >
+          <Hash className="w-5 h-5" />
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -41,7 +59,10 @@ export default function ChannelList({ collapsed }) {
           return (
             <button
               key={channel.id}
-              onClick={() => dispatch(setActiveChannel(channel.id))}
+              onClick={() => {
+                dispatch(setActiveChannel(channel.id))
+                dispatch(setFilter('all'))
+              }}
               className={`w-full flex items-center gap-2.5 rounded-lg transition-colors duration-100 ${
                 collapsed ? 'justify-center p-2.5' : 'px-3 py-1.5'
               } ${
