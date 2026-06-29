@@ -27,6 +27,7 @@ export function CallProvider({ children }) {
   const [isMuted, setIsMuted] = useState(false)
   const [isVideoOff, setIsVideoOff] = useState(false)
   const [isScreenSharing, setIsScreenSharing] = useState(false)
+  const isJoiningRef = useRef(false)
 
 
   // Initialize Agora Client on mount
@@ -146,6 +147,15 @@ export function CallProvider({ children }) {
   const joinAgoraChannel = async (channelName, type) => {
     if (!agoraClient || !user) return
     
+    if (isJoiningRef.current || agoraClient.connectionState !== 'DISCONNECTED') {
+      console.warn('Already joining or connected to Agora channel. Skipping duplicate join call.', {
+        isJoining: isJoiningRef.current,
+        connectionState: agoraClient.connectionState
+      })
+      return
+    }
+
+    isJoiningRef.current = true
     try {
       // 1. Fetch token
       const res = await getAgoraToken(channelName)
@@ -183,8 +193,10 @@ export function CallProvider({ children }) {
       setCallState('connected')
     } catch (err) {
       console.error('Failed to join Agora channel:', err)
-      alert('Could not join call. Please check internet connection or server configurations.')
+      alert(`Could not join call: ${err.message || err.code || err}`)
       endCall(true)
+    } finally {
+      isJoiningRef.current = false
     }
   }
 

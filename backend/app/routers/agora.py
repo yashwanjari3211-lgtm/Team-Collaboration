@@ -54,7 +54,7 @@ def get_agora_token(
         AGORA_APP_ID, 
         AGORA_APP_CERTIFICATE, 
         channelName, 
-        uid, 
+        0, 
         role, 
         privilege_expired_ts
     )
