@@ -52,7 +52,7 @@ export default function BoardsList({ collapsed }) {
               dispatch(createBoardThunk({ name: name.trim() }))
             }
           }}
-          className="p-1 rounded hover-surface text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 transition-colors opacity-0 group-hover:opacity-100" 
+          className="p-1 rounded hover-surface text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 transition-colors" 
           title="Create Board"
         >
           <Plus className="w-3.5 h-3.5" />

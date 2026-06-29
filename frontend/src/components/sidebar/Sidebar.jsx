@@ -24,6 +24,7 @@ export default function Sidebar() {
   const currentUser = useSelector(state => state.auth.user)
   const activeDmUserId = useSelector(state => state.channels.activeDmUserId)
   const messageFilter = useSelector(state => state.messages.filter || 'all')
+  const memberStatuses = useSelector(state => state.channels.memberStatuses || {})
   const [members, setMembers] = useState([])
 
   useEffect(() => {
@@ -124,14 +125,7 @@ export default function Sidebar() {
 
           <div className="space-y-0.5">
             {members.map(member => {
-              // Mock presence for now, can be wired to real presence later
-              const presence = 'online'
-              const presenceColor =
-                presence === 'online'
-                  ? 'bg-[#10B981]'
-                  : presence === 'away'
-                  ? 'bg-[#F59E0B]'
-                  : 'bg-[#6B7280]'
+              const presence = memberStatuses[member.id] || member.status || 'online'
 
               return (
                   <button
@@ -148,10 +142,7 @@ export default function Sidebar() {
                     title={collapsed ? member.full_name || member.email : undefined}
                   >
                   <div className="relative flex-shrink-0">
-                    <Avatar name={member.full_name || member.email} src={member.avatar} size="xs" />
-                    <span
-                      className={`absolute bottom-0 right-0 w-2 h-2 rounded-full border-2 border-white dark:border-surface-900 ${presenceColor}`}
-                    />
+                    <Avatar name={member.full_name || member.email} src={member.avatar} size="xs" presence={presence} />
                   </div>
                   {!collapsed && (
                     <span className="text-[13px] font-medium text-left truncate flex-1">{member.full_name || member.email}</span>

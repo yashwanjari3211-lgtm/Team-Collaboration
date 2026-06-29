@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useRef } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addMessage } from '../store/messageSlice'
+import { addMessage, setTyping } from '../store/messageSlice'
 import { addTask, updateTaskInState, removeTaskFromState } from '../store/boardSlice'
+import { setMemberStatus } from '../store/channelSlice'
 
 const WebSocketContext = createContext(null)
 
@@ -15,21 +16,24 @@ export function WebSocketProvider({ children }) {
   // can access the latest value without needing to be recreated on every channel switch.
   const activeChannelRef = useRef(activeChannelId)
   const wsRef = useRef(null)
+  const [wsInstance, setWsInstance] = useState(null)
 
   useEffect(() => {
     activeChannelRef.current = activeChannelId
   }, [activeChannelId])
 
+  const userId = user?.id
+
   useEffect(() => {
-    if (!user || !activeOrgId) return
+    if (!userId || !activeOrgId) return
 
     // Connect to the organization-wide WebSocket
-    const userId = user.id
     const userName = encodeURIComponent(user.full_name || user.email || 'Unknown')
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
     const host = window.location.hostname
     const ws = new WebSocket(`${protocol}//${host}:8000/api/ws/org_${activeOrgId}?user_id=${userId}&user_name=${userName}`)
     wsRef.current = ws
+    setWsInstance(ws)
 
     ws.onopen = () => {
       console.log(`WebSocket connected to org_${activeOrgId}`)
@@ -39,6 +43,24 @@ export function WebSocketProvider({ children }) {
       try {
         const data = JSON.parse(event.data)
         
+        // Handle typing events
+        if (data.type === 'typing') {
+          dispatch(setTyping({
+            channelId: data.channel_id,
+            userId: data.user_id,
+            userName: data.user_name,
+            isTyping: data.is_typing
+          }))
+        }
+
+        // Handle user status changes
+        if (data.type === 'user_status_updated') {
+          dispatch(setMemberStatus({
+            userId: data.user_id,
+            status: data.status
+          }))
+        }
+
         // Handle incoming chat messages
         if (data.type === 'message' || (!data.type && data.id)) {
           // Only dispatch if the message belongs to our currently active channel
@@ -74,18 +96,21 @@ export function WebSocketProvider({ children }) {
     ws.onclose = () => {
       console.log(`WebSocket disconnected from org_${activeOrgId}`)
       wsRef.current = null
+      setWsInstance(null)
     }
 
     return () => {
       ws.close()
+      wsRef.current = null
+      setWsInstance(null)
     }
-  }, [activeOrgId, user, dispatch])
+  }, [activeOrgId, userId, dispatch])
 
   // We return a function to get the current websocket so consumers always get the latest reference
   const getWs = () => wsRef.current
 
   return (
-    <WebSocketContext.Provider value={{ getWs }}>
+    <WebSocketContext.Provider value={{ getWs, ws: wsInstance }}>
       {children}
     </WebSocketContext.Provider>
   )

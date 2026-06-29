@@ -23,20 +23,6 @@ export default function MessageList({ channelName, onConvertToTask, isTyping = f
   const bottomRef = useRef(null)
 
   let filteredMessages = messages
-  if (filter === 'mentions') {
-    const nameQuery = user?.full_name || user?.email || ''
-    filteredMessages = messages.filter(msg => 
-      msg.content.includes('@') && 
-      (msg.content.toLowerCase().includes(nameQuery.toLowerCase()) || msg.content.toLowerCase().includes('all'))
-    )
-  } else if (filter === 'saved') {
-    // Show messages that are bookmarked/saved (in our mock case, messages containing link, attachment or own messages)
-    filteredMessages = messages.filter(msg => 
-      msg.content.includes('Attached') || msg.content.includes('http') || msg.content.includes('href')
-    )
-  } else if (filter === 'dms') {
-    filteredMessages = []
-  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -108,7 +94,7 @@ export default function MessageList({ channelName, onConvertToTask, isTyping = f
             <span className="w-1.5 h-1.5 bg-surface-400 dark:bg-surface-500 rounded-full animate-bounce-dot" style={{ animationDelay: '0.2s' }} />
             <span className="w-1.5 h-1.5 bg-surface-400 dark:bg-surface-500 rounded-full animate-bounce-dot" style={{ animationDelay: '0.4s' }} />
           </div>
-          <span>{typingUser || 'Someone'} is typing...</span>
+          <span>{typingUser || 'Someone'} {typingUser && typingUser.includes(',') ? 'are' : 'is'} typing...</span>
         </div>
       )}
 

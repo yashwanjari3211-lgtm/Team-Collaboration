@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getMessages } from '../api/messages'
 import { getChannels } from '../api/channels'
 import { getOrganizations } from '../api/organizations'
-import { setMessages, setMessagesLoading } from '../store/messageSlice'
+import { setMessages, setMessagesLoading, setSavedIds } from '../store/messageSlice'
 import { setChannels, setChannelsLoading, setActiveDmChannelId } from '../store/channelSlice'
 import { setConvertingMessage } from '../store/uiSlice'
 import { setCredentials } from '../store/authSlice'
@@ -94,15 +94,37 @@ export default function DashboardPage() {
     fetchDmChannel()
   }, [activeDmUserId, dispatch])
 
-  // Fetch messages when active public channel changes
+  // Fetch user's saved message IDs on mount/user load
   useEffect(() => {
-    if (!activeChannelId) return
+    if (!user) return
+    const fetchSaved = async () => {
+      try {
+        const res = await client.get('/messages/saved')
+        dispatch(setSavedIds(res.data.map(m => m.id)))
+      } catch (err) {
+        console.error('Failed to fetch saved messages:', err)
+      }
+    }
+    fetchSaved()
+  }, [user, dispatch])
 
+  const filter = useSelector(state => state.messages.filter || 'all')
+
+  // Fetch messages when active channel or filter changes
+  useEffect(() => {
     const fetchData = async () => {
       dispatch(setMessagesLoading(true))
       try {
-        const msgRes = await getMessages(activeChannelId)
-        dispatch(setMessages(msgRes.data))
+        if (filter === 'mentions') {
+          const res = await client.get('/messages/mentions')
+          dispatch(setMessages(res.data))
+        } else if (filter === 'saved') {
+          const res = await client.get('/messages/saved')
+          dispatch(setMessages(res.data))
+        } else if (activeChannelId) {
+          const msgRes = await getMessages(activeChannelId)
+          dispatch(setMessages(msgRes.data))
+        }
       } catch (err) {
         console.error('Failed to fetch messages:', err)
       } finally {
@@ -110,9 +132,7 @@ export default function DashboardPage() {
       }
     }
     fetchData()
-  }, [activeChannelId, dispatch])
-
-  const filter = useSelector(state => state.messages.filter || 'all')
+  }, [activeChannelId, filter, dispatch])
 
   // Get active channel name (or DM username)
   const activeChannel = channels.find(c => c.id === activeChannelId)

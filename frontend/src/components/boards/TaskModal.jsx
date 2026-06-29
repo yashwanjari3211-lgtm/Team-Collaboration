@@ -102,7 +102,7 @@ export default function TaskModal({ task, onClose }) {
   };
   
   const currentColumn = activeBoard?.columns?.find(c => c.id === task.column_id);
-  const assignee = members.find(m => m.user.id === task.assignee_id)?.user;
+  const assignee = members.find(m => m.id === task.assignee_id);
   const AVAILABLE_LABELS = ['UI', 'Bug', 'Feature', 'API', 'Design', 'Urgent'];
 
   return (
@@ -145,8 +145,8 @@ export default function TaskModal({ task, onClose }) {
                 <div>
                   <h4 className="text-xs font-semibold text-surface-500 uppercase tracking-wider mb-2">Assignee</h4>
                   <div className="flex items-center gap-2">
-                    <Avatar name={assignee.name || assignee.email} size="sm" />
-                    <span className="text-sm font-medium">{assignee.name || assignee.email.split('@')[0]}</span>
+                    <Avatar name={assignee.full_name || assignee.email} size="sm" />
+                    <span className="text-sm font-medium">{assignee.full_name || assignee.email.split('@')[0]}</span>
                   </div>
                 </div>
               )}
@@ -238,15 +238,15 @@ export default function TaskModal({ task, onClose }) {
                   </div>
                 </div>
 
-                {/* List Comments */}
+                 {/* List Comments */}
                 {comments.map(comment => {
-                  const commentUser = members.find(m => m.user.id === comment.user_id)?.user || { name: 'Unknown', email: 'unknown' };
+                  const commentUser = members.find(m => m.id === comment.user_id) || { full_name: 'Unknown', email: 'unknown' };
                   return (
                     <div key={comment.id} className="flex gap-3">
-                      <Avatar name={commentUser.name || commentUser.email} size="sm" />
+                      <Avatar name={commentUser.full_name || commentUser.email} size="sm" />
                       <div className="flex-1">
                         <p className="text-sm">
-                          <span className="font-semibold text-surface-900 dark:text-surface-100">{commentUser.name || commentUser.email.split('@')[0]}</span> 
+                          <span className="font-semibold text-surface-900 dark:text-surface-100">{commentUser.full_name || commentUser.email.split('@')[0]}</span> 
                           <span className="text-surface-500 text-xs ml-2">{new Date(comment.created_at).toLocaleString()}</span>
                         </p>
                         <div className="mt-1 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 p-3 rounded-xl text-sm text-surface-700 dark:text-surface-300 shadow-sm">
@@ -274,8 +274,8 @@ export default function TaskModal({ task, onClose }) {
                   {showMembers && (
                     <div className="absolute top-full left-0 mt-1 w-full bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg shadow-xl z-10 overflow-hidden">
                       {members.map(m => (
-                        <button key={m.user.id} onClick={() => handleAssignMember(m.user.id)} className="w-full text-left px-3 py-2 hover:bg-surface-50 dark:hover:bg-surface-700 text-sm">
-                          {m.user.name || m.user.email}
+                        <button key={m.id} onClick={() => handleAssignMember(m.id)} className="w-full text-left px-3 py-2 hover:bg-surface-50 dark:hover:bg-surface-700 text-sm">
+                          {m.full_name || m.email}
                         </button>
                       ))}
                     </div>

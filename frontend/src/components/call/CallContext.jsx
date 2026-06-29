@@ -91,7 +91,7 @@ export function CallProvider({ children }) {
   }, [agoraClient])
 
   // We use the global websocket for call signaling
-  const { getWs } = useGlobalWebSocket()
+  const { getWs, ws } = useGlobalWebSocket()
 
   // Get or create WebSocket for ringing signaling (we still use this to "ring" someone before Agora connects)
   const getCallWs = useCallback(() => {
@@ -125,7 +125,6 @@ export function CallProvider({ children }) {
 
   // Update the message handler when state changes
   useEffect(() => {
-    const ws = getWs()
     if (!ws) return
 
     const handleMessage = (event) => {
@@ -141,7 +140,7 @@ export function CallProvider({ children }) {
     return () => {
       ws.removeEventListener('message', handleMessage)
     }
-  }, [handleSignalingMessage, getWs])
+  }, [handleSignalingMessage, ws])
 
   // Agora: Join channel and publish tracks
   const joinAgoraChannel = async (channelName, type) => {
@@ -155,25 +154,36 @@ export function CallProvider({ children }) {
       // 2. Join channel
       await agoraClient.join(appId, channelName, token, uid)
       
-      // 3. Create local tracks
-      const audioTrack = await AgoraRTC.createMicrophoneAudioTrack()
-      setLocalAudioTrack(audioTrack)
+      // 3. Create local tracks with safe catch
+      const tracksToPublish = []
       
-      let videoTrack = null
+      try {
+        const audioTrack = await AgoraRTC.createMicrophoneAudioTrack()
+        setLocalAudioTrack(audioTrack)
+        tracksToPublish.push(audioTrack)
+      } catch (audioErr) {
+        console.warn('Microphone permission or hardware missing, joining listen-only mode:', audioErr)
+      }
+      
       if (type === 'video') {
-        videoTrack = await AgoraRTC.createCameraVideoTrack()
-        setLocalVideoTrack(videoTrack)
+        try {
+          const videoTrack = await AgoraRTC.createCameraVideoTrack()
+          setLocalVideoTrack(videoTrack)
+          tracksToPublish.push(videoTrack)
+        } catch (videoErr) {
+          console.warn('Camera permission or hardware missing, joining voice-only/no-video mode:', videoErr)
+        }
       }
 
       // 4. Publish tracks
-      const tracksToPublish = [audioTrack]
-      if (videoTrack) tracksToPublish.push(videoTrack)
-      await agoraClient.publish(tracksToPublish)
+      if (tracksToPublish.length > 0) {
+        await agoraClient.publish(tracksToPublish)
+      }
       
       setCallState('connected')
     } catch (err) {
       console.error('Failed to join Agora channel:', err)
-      alert('Could not join call. Please check microphone/camera permissions.')
+      alert('Could not join call. Please check internet connection or server configurations.')
       endCall(true)
     }
   }

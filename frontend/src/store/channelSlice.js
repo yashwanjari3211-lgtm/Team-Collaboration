@@ -8,6 +8,7 @@ const channelSlice = createSlice({
     activeDmUserId: null, // Track when we are in a DM instead of a channel
     activeDmUser: null, // Store the DM user info
     loading: false,
+    memberStatuses: {}, // Track presence: user_id -> status
   },
   reducers: {
     setChannels: (state, action) => {
@@ -36,6 +37,11 @@ const channelSlice = createSlice({
     addChannel: (state, action) => {
       state.items.push(action.payload)
     },
+    setMemberStatus: (state, action) => {
+      const { userId, status } = action.payload
+      if (!state.memberStatuses) state.memberStatuses = {}
+      state.memberStatuses[userId] = status
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -47,5 +53,5 @@ const channelSlice = createSlice({
   }
 })
 
-export const { setChannels, setActiveChannel, setActiveDm, setActiveDmChannelId, setChannelsLoading, addChannel } = channelSlice.actions
+export const { setChannels, setActiveChannel, setActiveDm, setActiveDmChannelId, setChannelsLoading, addChannel, setMemberStatus } = channelSlice.actions
 export default channelSlice.reducer

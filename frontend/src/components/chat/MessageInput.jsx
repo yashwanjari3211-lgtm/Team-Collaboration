@@ -9,6 +9,7 @@ import EmojiPicker from './EmojiPicker'
 import MentionDropdown from './MentionDropdown'
 import { motion } from 'framer-motion'
 import clsx from 'clsx'
+import { useGlobalWebSocket } from '../../providers/WebSocketProvider'
 
 export default function MessageInput({ channelName }) {
   const [text, setText] = useState('')
@@ -30,7 +31,42 @@ export default function MessageInput({ channelName }) {
   const emojiButtonRef = useRef(null)
   const activeChannelId = useSelector(state => state.channels.activeId)
   const replyingTo = useSelector(state => state.ui.replyingTo)
+  const currentUser = useSelector(state => state.auth.user)
   const dispatch = useDispatch()
+
+  const { getWs } = useGlobalWebSocket()
+  const typingTimeoutRef = useRef(null)
+  const isCurrentlyTypingRef = useRef(false)
+
+  const sendTypingStatus = (isTyping) => {
+    const ws = getWs()
+    if (ws && ws.readyState === WebSocket.OPEN && activeChannelId && currentUser) {
+      try {
+        ws.send(JSON.stringify({
+          type: 'typing',
+          channel_id: activeChannelId,
+          user_id: currentUser.id,
+          user_name: currentUser.full_name || currentUser.email || 'Unknown',
+          is_typing: isTyping
+        }))
+        isCurrentlyTypingRef.current = isTyping
+      } catch (err) {
+        console.error('Failed to send typing status via WebSocket:', err)
+      }
+    }
+  }
+
+  // Clear typing on activeChannelId change or unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+      if (isCurrentlyTypingRef.current) {
+        sendTypingStatus(false)
+      }
+    }
+  }, [activeChannelId])
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -191,6 +227,11 @@ export default function MessageInput({ channelName }) {
       content = `<blockquote><strong>${username}:</strong> ${rawText}</blockquote>${content}`
     }
 
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+    sendTypingStatus(false)
+
     setSending(true)
     try {
       const res = await sendMessage(content, activeChannelId)
@@ -248,6 +289,17 @@ export default function MessageInput({ channelName }) {
     }
     const content = getPlainText()
     setText(content)
+
+    // Emit typing status
+    if (!isCurrentlyTypingRef.current) {
+      sendTypingStatus(true)
+    }
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+    typingTimeoutRef.current = setTimeout(() => {
+      sendTypingStatus(false)
+    }, 2000)
 
     const sel = window.getSelection()
     if (sel && sel.rangeCount > 0) {

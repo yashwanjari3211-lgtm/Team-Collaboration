@@ -1,7 +1,7 @@
 import client from './client';
 
 export const getBoards = () => {
-  return client.get('/boards');
+  return client.get('/boards/');
 };
 
 export const getBoard = (boardId) => {
@@ -9,7 +9,7 @@ export const getBoard = (boardId) => {
 };
 
 export const createBoard = (data) => {
-  return client.post('/boards', data);
+  return client.post('/boards/', data);
 };
 
 export const updateBoard = (boardId, data) => {

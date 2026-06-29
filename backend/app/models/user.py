@@ -12,4 +12,5 @@ class User(Base):
     avatar = Column(String)
     google_id = Column(String, unique=True, nullable=True, index=True)
     auth_provider = Column(String, default="local")  # "local" or "google"
+    status = Column(String, default="online", server_default="online")
     created_at = Column(DateTime(timezone=True), server_default=func.now())

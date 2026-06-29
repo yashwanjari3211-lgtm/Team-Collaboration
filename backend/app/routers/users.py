@@ -13,16 +13,31 @@ router = APIRouter()
 UPLOAD_DIR = "/app/uploads/avatars"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+from fastapi import Request
+from app.services.websocket_manager import manager
+
 @router.get("/me", response_model=UserOut)
 def get_current_user_info(current_user: User = Depends(get_current_user)):
     return current_user
 
 @router.patch("/me", response_model=UserOut)
-def update_profile(updates: UserUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def update_profile(updates: UserUpdate, request: Request, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if updates.full_name is not None:
         current_user.full_name = updates.full_name
+    if updates.status is not None:
+        current_user.status = updates.status
     db.commit()
     db.refresh(current_user)
+    
+    # Broadcast user status change to organization
+    org_id = request.headers.get("X-Organization-Id")
+    if org_id and updates.status is not None:
+        await manager.broadcast(f"org_{org_id}", {
+            "type": "user_status_updated",
+            "user_id": current_user.id,
+            "status": current_user.status
+        })
+        
     return current_user
 
 @router.post("/me/avatar", response_model=UserOut)

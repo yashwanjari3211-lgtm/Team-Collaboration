@@ -14,8 +14,8 @@ router = APIRouter()
 
 # Note: In production, these should be securely injected via environment variables.
 # Using dummy defaults for prototype purposes if env vars are missing.
-AGORA_APP_ID = os.getenv("AGORA_APP_ID", "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4")
-AGORA_APP_CERTIFICATE = os.getenv("AGORA_APP_CERTIFICATE", "1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d")
+AGORA_APP_ID = os.getenv("AGORA_APP_ID")
+AGORA_APP_CERTIFICATE = os.getenv("AGORA_APP_CERTIFICATE")
 
 @router.get("/token")
 def get_agora_token(

@@ -1,8 +1,11 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setReplyingTo } from '../../store/uiSlice'
 import Avatar from '../common/Avatar'
-import { SmilePlus, Reply, Forward, ListTodo } from 'lucide-react'
+import { SmilePlus, Reply, Forward, ListTodo, Bookmark } from 'lucide-react'
+import ForwardModal from './ForwardModal'
+import client from '../../api/client'
+import { saveMessageInState, unsaveMessageInState } from '../../store/messageSlice'
 
 function formatTime(dateStr) {
   const d = new Date(dateStr)
@@ -12,6 +15,24 @@ function formatTime(dateStr) {
 export default function MessageBubble({ message, isOwn, userName, onConvertToTask, isGrouped }) {
   const dispatch = useDispatch()
   const [reacted, setReacted] = useState(false)
+  const [isForwardOpen, setIsForwardOpen] = useState(false)
+
+  const savedIds = useSelector(state => state.messages.savedIds || [])
+  const isSaved = savedIds.includes(message.id)
+
+  const handleBookmark = async () => {
+    try {
+      if (isSaved) {
+        await client.delete(`/messages/${message.id}/unsave`)
+        dispatch(unsaveMessageInState(message.id))
+      } else {
+        await client.post(`/messages/${message.id}/save`)
+        dispatch(saveMessageInState(message.id))
+      }
+    } catch (err) {
+      console.error('Failed to toggle bookmark:', err)
+    }
+  }
 
   return (
     <div
@@ -34,6 +55,9 @@ export default function MessageBubble({ message, isOwn, userName, onConvertToTas
               {userName}
             </span>
             <span className="text-[10px] text-surface-400">{formatTime(message.created_at)}</span>
+            {isSaved && (
+              <Bookmark className="w-3 h-3 text-amber-500 fill-amber-500 ml-1 flex-shrink-0" />
+            )}
           </div>
         )}
 
@@ -61,9 +85,14 @@ export default function MessageBubble({ message, isOwn, userName, onConvertToTas
           <Reply className="w-3.5 h-3.5" />
         </button>
         <button 
-          onClick={() => alert('Forward feature coming soon!')}
+          onClick={() => setIsForwardOpen(true)}
           className="p-1.5 rounded-md hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors" title="Forward">
           <Forward className="w-3.5 h-3.5" />
+        </button>
+        <button 
+          onClick={handleBookmark}
+          className={`p-1.5 rounded-md hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors ${isSaved ? 'text-amber-500' : 'text-surface-400 hover:text-surface-600 dark:hover:text-surface-300'}`} title={isSaved ? "Unsave" : "Save"}>
+          <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-amber-500' : ''}`} />
         </button>
         <button
           onClick={() => onConvertToTask?.(message.content)}
@@ -73,6 +102,8 @@ export default function MessageBubble({ message, isOwn, userName, onConvertToTas
           <ListTodo className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      <ForwardModal isOpen={isForwardOpen} onClose={() => setIsForwardOpen(false)} message={message} />
     </div>
   )
 }

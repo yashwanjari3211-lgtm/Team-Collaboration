@@ -49,7 +49,8 @@ class ConnectionManager:
         """Send a message to a specific user in a room."""
         if room_id in self.active_connections:
             for ws, info in self.active_connections[room_id]:
-                if info.get('user_id') == user_id:
+                conn_user_id = info.get('user_id')
+                if conn_user_id is not None and str(conn_user_id) == str(user_id):
                     try:
                         await ws.send_json(message)
                     except Exception:
@@ -62,12 +63,17 @@ class ConnectionManager:
 
     async def send_to_user_global(self, user_id: int, message: dict):
         """Send a message to a specific user across all rooms."""
+        print(f"[WS DEBUG] Target user_id={user_id} (type={type(user_id)}). Active connections: {self.active_connections}")
         for room_id, connections in self.active_connections.items():
             for ws, info in connections:
-                if info.get('user_id') == user_id:
+                conn_user_id = info.get('user_id')
+                print(f"[WS DEBUG] Checking conn user_id={conn_user_id} (type={type(conn_user_id)}) against target={user_id}")
+                if conn_user_id is not None and str(conn_user_id) == str(user_id):
                     try:
+                        print(f"[WS DEBUG] Matched! Sending message: {message}")
                         await ws.send_json(message)
-                    except Exception:
+                    except Exception as e:
+                        print(f"[WS DEBUG] Error sending: {e}")
                         pass
 
     async def send_to_users_global(self, user_ids: List[int], message: dict):

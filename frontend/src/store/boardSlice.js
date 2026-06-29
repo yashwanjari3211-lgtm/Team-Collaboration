@@ -159,5 +159,5 @@ const boardSlice = createSlice({
 });
 
 export const { setBoards, setActiveBoard, moveTask, addColumn, addTask, updateTaskInState, removeTaskFromState } = boardSlice.actions;
-export { createBoardThunk };
 export default boardSlice.reducer;
+

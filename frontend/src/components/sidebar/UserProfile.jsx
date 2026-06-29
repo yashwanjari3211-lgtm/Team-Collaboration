@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { logout } from '../../store/authSlice'
+import { logout, setCredentials } from '../../store/authSlice'
 import { useNavigate } from 'react-router-dom'
 import { Settings, LogOut, CreditCard } from 'lucide-react'
 import Avatar from '../common/Avatar'
 import UserSettingsModal from './UserSettingsModal'
+import client from '../../api/client'
 
 export default function UserProfile({ collapsed }) {
   const dispatch = useDispatch()
@@ -19,19 +20,40 @@ export default function UserProfile({ collapsed }) {
 
   const displayName = user?.full_name || user?.email || 'User'
 
+  const changeStatus = async (newStatus) => {
+    try {
+      const res = await client.patch('/users/me', { status: newStatus })
+      dispatch(setCredentials({
+        token: localStorage.getItem('token'),
+        user: res.data
+      }))
+    } catch (err) {
+      console.error('Failed to update status:', err)
+    }
+  }
+
   return (
     <div className={`shrink-0 border-t border-surface-100 dark:border-surface-800 ${
       collapsed ? 'p-2 flex flex-col items-center gap-2' : 'p-3'
     }`}>
       <div className={`flex items-center ${collapsed ? 'flex-col gap-2' : 'gap-3'}`}>
-        <Avatar name={displayName} src={user?.avatar} size="sm" presence="online" />
+        <Avatar name={displayName} src={user?.avatar} size="sm" presence={user?.status || 'online'} />
 
         {!collapsed && (
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-surface-800 dark:text-surface-200 truncate">
+            <p className="text-[13px] font-semibold text-surface-800 dark:text-white truncate">
               {displayName}
             </p>
-            <p className="text-[11px] text-surface-400 truncate">{user?.email || ''}</p>
+            <select
+              value={user?.status || 'online'}
+              onChange={(e) => changeStatus(e.target.value)}
+              className="mt-0.5 text-[11px] bg-transparent text-surface-450 dark:text-surface-400 focus:outline-none border-none cursor-pointer p-0 font-medium"
+            >
+              <option value="online" className="bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white">🟢 Active</option>
+              <option value="away" className="bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white">🟡 Away</option>
+              <option value="busy" className="bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white">🔴 Busy</option>
+              <option value="offline" className="bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white">⚫ Offline</option>
+            </select>
           </div>
         )}
 
